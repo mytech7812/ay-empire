@@ -456,6 +456,36 @@
     .hero-content-col { padding: 2rem 5%; }
     .hero-badge { font-size: 0.75rem; padding: 0.8rem; }
   }
+ .treatments-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .treatments-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+/* Add this to your existing CSS */
+
+@media (max-width: 768px) {
+  .span-2-mobile {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+  
+  .span-2-mobile .treatment-img {
+    aspect-ratio: 3/2;
+    height: auto;
+  }
+  
+  .span-2-mobile .treatment-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
 
 </style>
 </head>
@@ -526,8 +556,8 @@
     <img src="images/treatment.jpg" alt="Spiritual Cleansing" style="width: 100%; height: 100%; object-fit: cover;">
   </div>
   <div class="treatment-info">
-    <div class="treatment-name">Spiritual Cleansing</div>
-    <div class="treatment-sub">Protection &amp; Spiritual Work</div>
+    <div class="treatment-name">Attraction perfume</div>
+    <div class="treatment-sub">Love &amp; attraction</div>
   </div>
 </div>
 
@@ -548,8 +578,8 @@
     <img src="images/attraction.jpg" alt="Attraction Perfume" style="width: 100%; height: 100%; object-fit: cover;">
   </div>
   <div class="treatment-info">
-    <div class="treatment-name">Attraction Perfume</div>
-    <div class="treatment-sub">Love &amp; Attraction</div>
+    <div class="treatment-name">Seduction Oil</div>
+    <div class="treatment-sub">Men Attraction</div>
   </div>
 </div>
 
@@ -597,11 +627,22 @@
   </div>
 </div>
 
+<!-- Card 9 - Spiritual Cleansing (spans 2 columns on mobile) -->
+<div class="treatment-card span-2-mobile">
+  <div class="treatment-img">
+    <img src="images/cleansing.jpg" alt="Spiritual Cleansing" style="width: 100%; height: 100%; object-fit: cover;">
   </div>
+  <div class="treatment-info">
+    <div class="treatment-name">Spiritual Cleansing</div>
+    <div class="treatment-sub">Protection &amp; Spiritual Works</div>
+  </div>
+</div>
 
-  <div class="treatments-cta">
-    <a href="#" class="btn-primary">View All Products</a>
-  </div>
+</div> <!-- Close treatments-grid -->
+
+<div class="treatments-cta">
+  <a href="#" class="btn-primary">View All Products</a>
+</div>
 </section>
 
 <!-- ABOUT -->
