@@ -486,6 +486,56 @@
     object-fit: cover;
   }
 }
+/* TIKTOK FLOAT BUTTON */
+.tiktok-float {
+  position: fixed;
+  bottom: 100px;
+  right: 32px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: #000000;
+  color: #fff;
+  padding: 0.75rem 1.3rem;
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border-radius: 50px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.tiktok-float:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
+}
+.tiktok-float svg {
+  width: 20px;
+  height: 20px;
+  fill: #fff;
+}
+
+/* Adjust WhatsApp button position */
+.telegram-float {
+  bottom: 32px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .tiktok-float {
+    bottom: 85px;
+    right: 16px;
+    padding: 0.5rem 1rem;
+    font-size: 0.7rem;
+  }
+  .telegram-float {
+    bottom: 16px;
+    right: 16px;
+    padding: 0.5rem 1rem;
+    font-size: 0.7rem;
+  }
+}
 
 </style>
 </head>
@@ -534,7 +584,7 @@
       Our Specialties
       <span style="width:28px;height:1px;background:var(--gold);display:inline-block;"></span>
     </div>
-    <h2 class="section-title">PRODUCTS AND SERVICES</h2>
+    <h2 class="section-title" style="font-size: clamp(1.5rem, 2.5vw, 2.2rem);">PRODUCTS AND SERVICES</h2>
   </div>
 
   <div class="treatments-grid">
@@ -627,6 +677,28 @@
   </div>
 </div>
 
+<!-- Card 9 - Cleansing Kit -->
+<div class="treatment-card">
+  <div class="treatment-img">
+    <img src="images/cleansingkit.jpg" alt="Cleansing Kit" style="width: 100%; height: 100%; object-fit: cover;">
+  </div>
+  <div class="treatment-info">
+    <div class="treatment-name">Cleansing Kit</div>
+    <div class="treatment-sub">Complete Spiritual Cleansing</div>
+  </div>
+</div>
+
+<!-- Card 10 - Bonding Kit -->
+<div class="treatment-card">
+  <div class="treatment-img">
+    <img src="images/favour.jpg" alt="Bonding Kit" style="width: 100%; height: 100%; object-fit: cover;">
+  </div>
+  <div class="treatment-info">
+    <div class="treatment-name">Bonding Kit</div>
+    <div class="treatment-sub">Love Bonding</div>
+  </div>
+</div>
+
 <!-- Card 9 - Spiritual Cleansing (spans 2 columns on mobile) -->
 <div class="treatment-card span-2-mobile">
   <div class="treatment-img">
@@ -661,7 +733,7 @@
         Our ingredients represent less than 1% of the world's finest herbs — selected with intention, care, and generations of traditional wisdom. Our diverse and subtle formulas are the result of creating without compromise.
       </p>
       <p class="about-body">
-        Founded with the vision of helping people find clarity, balance, confidence, protection, and positive transformation, AY Empire combines traditional herbal knowledge, prayer, and spiritual guidance to create products and services that align with your personal goals and spiritual needs.
+        Founded with the vision of helping people find clarity, balance, confidence, protection, and positive transformation. AY Empire combines traditional herbal knowledge, prayer, and spiritual guidance to create products and services that align with your personal goals and spiritual needs.
       </p>
 
       <div class="about-pillars">
@@ -744,12 +816,12 @@
 
   <div class="reviews-grid">
 
-    <div class="review-card">
-      <div class="review-quote">"</div>
-      <p class="review-text">Good morning sis, guess you are doing ok… God has finally answered me for I have been a TTC mom for 1 year 3 months now. My last scan says I have urine fibroids and left side ovarian cyst, and I came to buy fibroids herbs cause I don't want to operate it. 2 weeks later I still came to buy infection herb hoping I will go for another scan — and boom I missed my period sis, test positive to pregnancy! And the best part is I haven't even started the infection herb. God will bless the work of your hands.</p>
-      <div class="review-stars">★★★★★</div>
-      <div class="review-name">— Anonymous</div>
-    </div>
+<div class="review-card">
+  <div class="review-quote">"</div>
+  <p class="review-text">I've been struggling with bad luck and setbacks for years. Nothing seemed to work no matter how hard I tried. A friend recommended the Curse Breaker kit and I decided to give it a try. Within weeks of using it, everything started shifting — new opportunities came, I got a promotion at work, and the constant obstacles disappeared. I feel lighter and more at peace. Thank you AY Empire for changing my life!</p>
+  <div class="review-stars">★★★★★</div>
+  <div class="review-name">— Anonymous</div>
+</div>
 
     <div class="review-card">
       <div class="review-quote">"</div>
@@ -848,10 +920,18 @@
   </div>
 </footer>
 
+<!-- TIKTOK FLOAT BUTTON -->
+<a href="https://www.tiktok.com/@southafrican_kayamata_?_r=1&_t=ZS-97LFaBHtfKX" target="_blank" class="tiktok-float" aria-label="Follow us on TikTok">
+  <svg viewBox="0 0 24 24" fill="white">
+    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-.88-.05 6.34 6.34 0 00-6.33 6.33A6.34 6.34 0 009.32 21.5a6.34 6.34 0 006.33-6.33v-3.48a10.71 10.71 0 006.23 2.11V11.5a6.34 6.34 0 01-2.29-4.81z"/>
+  </svg>
+  Follow us on TikTok
+</a>
+
 <!-- WHATSAPP FLOAT BUTTON -->
 <a href="https://wa.me/message/FB7FUV772WMUE1" target="_blank" class="telegram-float" aria-label="Chat on WhatsApp">
   <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-  Join us on WhatsApp
+  Chat us on WhatsApp
 </a>
 
 <script>
