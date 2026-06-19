@@ -72,9 +72,12 @@
     padding-top: 72px;
     background: var(--cream-light);
   }
-  .hero-image-col {
-    width: 52%; position: relative; overflow: hidden;
-  }
+.hero-image-col {
+  width: 52%;
+  position: relative;
+  overflow: hidden;
+  min-height: 600px; /* Add this - adjust the number */
+}
   .hero-image-col img {
     width: 100%; height: 100%; object-fit: cover;
     object-position: center top;
@@ -438,7 +441,7 @@
     .btn-primary, .btn-secondary { text-align: center; width: 100%; }
     section { padding: 3rem 4%; }
     .footer-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-    .hero-image-col { height: 45vh; min-height: 350px; }
+    .hero-image-col { height: 55vh; min-height: 400px; }
     .hero-image-col img { object-position: center 45%; }
     .telegram-float { bottom: 16px; right: 16px; padding: 0.5rem 1rem; font-size: 0.7rem; }
     .hero h1 { font-size: 2rem; }
@@ -615,7 +618,7 @@
 <!-- HERO -->
 <section class="hero" id="home">
 <div class="hero-image-col">
-  <img src="images/header.jpg" alt="AY Empire – Founder" />
+  <img src="images/header.jpg" alt="AY Empire – Founder" style="width: 100%; height: 100%; object-fit: cover; object-position: center;" />
 </div>
   <div class="hero-content-col">
     <div class="hero-eyebrow">About Us</div>
@@ -894,14 +897,14 @@
 
     <div class="review-card">
       <div class="review-quote">"</div>
-      <p class="review-text">Good afternoon ma. Am so happy, I am pregnant! You are the best I swear to God. After God na you. Am so happy, God will continue to bless you abundantly for this great work you are doing.</p>
+      <p class="review-text">I highly recommend this spiritual brand, they're the best.</p>
       <div class="review-stars">★★★★★</div>
       <div class="review-name">— Anonymous</div>
     </div>
 
     <div class="review-card">
       <div class="review-quote">"</div>
-      <p class="review-text">Good afternoon ma. I have good news — I'm pregnant! After using your infection herbs. Thank you so much. God bless you ma, you have no idea what this means to me and my family.</p>
+      <p class="review-text">Good afternoon ma. I have good news — I'm pregnant! After using the full curse breaker set. Thank you so much. God bless you ma, you have no idea what this means to me and my family.</p>
       <div class="review-stars">★★★★★</div>
       <div class="review-name">— Anonymous</div>
     </div>
