@@ -4,8 +4,27 @@
 <meta charset="UTF-8">
 <meta name="google-site-verification" content="ofCz0pR4S5hlWHyT6DqNRs9AC0q8vkNyU7cjOBatm9s" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AY Empire – South African Kayamata Palace</title>
+
+<meta name="description" content="AY Empire offers authentic kayanmata products, spiritual items, personalized consultations, and wellness guidance for individuals seeking confidence, clarity, and personal growth.">
+
+<link rel="canonical" href="https://ayempire.com/">
+
+<!-- ADD THE SCHEMA SCRIPT HERE -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "AY Empire",
+  "url": "https://ayempire.com",
+  "description": "AY Empire offers kayanmata products, spiritual items, consultations, and wellness guidance.",
+  "logo": "https://ayempire.com/images/logo.jpg"
+}
+</script>
+
+<title>AY Empire | Kayanmata Products, Spiritual Consultations & Wellness Support</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
 <style>
   :root {
     --cream: #F5EDE0;
@@ -77,7 +96,14 @@
   width: 52%;
   position: relative;
   overflow: hidden;
-  min-height: 600px; /* Add this - adjust the number */
+  min-height: 450px; /* Desktop height */
+}
+
+@media (max-width: 768px) {
+  .hero-image-col {
+    height: 55vh;
+    min-height: 400px; /* Mobile height */
+  }
 }
   .hero-image-col img {
     width: 100%; height: 100%; object-fit: cover;
@@ -603,8 +629,9 @@
 
 <!-- NAVBAR -->
 <nav>
-  <a href="#" class="nav-logo">AY <span>Empire</span></a>
-  <ul class="nav-links">
+<a href="#" class="nav-logo">
+  <img src="images/logo.jpeg" alt="AY Empire Logo" style="height: 50px; width: auto; display: block;">
+</a>  <ul class="nav-links">
     <li><a href="#">Home</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#treatments">Services</a></li>
