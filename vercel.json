@@ -1,0 +1,28 @@
+{
+  "routes": [
+    {
+      "src": "/admin",
+      "dest": "/admin/login.html"
+    },
+    {
+      "src": "/admin/dashboard",
+      "dest": "/admin/dashboard.html"
+    },
+    {
+      "src": "/admin/orders",
+      "dest": "/admin/orders.html"
+    },
+    {
+      "src": "/admin/products",
+      "dest": "/admin/products.html"
+    },
+    {
+      "src": "/admin/(.*)",
+      "dest": "/admin/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}
