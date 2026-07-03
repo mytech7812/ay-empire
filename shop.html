@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Shop authentic kayanmata products, spiritual items, consultations, and wellness products at AY Empire.">
+  <link rel="canonical" href="https://ayempire.com/shop">
+
+  <title>Shop All Products | AY Empire</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo.png" alt="AY Empire" style="height: 130px; width: auto; vertical-align: middle; margin-top: 4px; margin-left: -10px;">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html" class="active">Shop</a></li>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#reviews">Testimonials</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- SHOP HERO / BANNER -->
+<section class="shop-hero">
+  <div class="shop-hero-content">
+    <h1>All Products</h1>
+    <p>Browse our complete collection of spiritual, wellness, and kayanmata products.</p>
+  </div>
+</section>
+
+<!-- SHOP SECTION -->
+<section class="shop-section">
+  <div class="shop-container">
+
+    <!-- Filter & Sort Bar -->
+    <div class="shop-toolbar">
+      <div class="shop-filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="spiritual">Spiritual</button>
+        <button class="filter-btn" data-filter="wellness">Wellness</button>
+        <button class="filter-btn" data-filter="kayanmata">Kayamata</button>
+      </div>
+
+      <div class="shop-controls-right">
+        <div class="shop-sort">
+          <label for="sort-select">Sort by:</label>
+          <select id="sort-select">
+            <option value="default">Default</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name-asc">Name: A to Z</option>
+            <option value="name-desc">Name: Z to A</option>
+          </select>
+        </div>
+
+        <!-- Currency Selector -->
+        <div class="currency-selector shop-currency-selector">
+          <button class="currency-btn" id="currency-btn">
+            <span id="currency-display">₦ NGN</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="currency-dropdown" id="currency-dropdown">
+            <button class="currency-option" data-currency="NGN">₦ NGN</button>
+            <button class="currency-option" data-currency="ZAR">R ZAR</button>
+            <button class="currency-option" data-currency="USD">$ USD</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="shop-grid" id="shop-grid">
+      <!-- Products will be loaded here by JavaScript -->
+      <div class="loading-message">Loading products...</div>
+    </div>
+
+    <!-- Empty State (hidden by default) -->
+    <div class="empty-state" id="empty-state" style="display: none;">
+      <p>No products found in this category.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">AY <span>Empire</span></div>
+      <p class="footer-tagline">South African Kayamata Palace — dedicated to supporting your personal, spiritual, and wellness journey through carefully crafted herbal products and traditional spiritual services.</p>
+    </div>
+    <div>
+      <div class="footer-heading">About</div>
+      <ul class="footer-links">
+        <li><a href="#">FAQs</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div> 
+    <div>
+      <div class="footer-heading">Help Center</div>
+      <ul class="footer-links">
+        <li><a href="#">Terms &amp; Conditions</a></li>
+        <li><a href="#">Returns &amp; Refunds</a></li>
+        <li><a href="#">Privacy Notice</a></li>
+        <li><a href="#">Shopping</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-heading">Get In Touch</div>
+      <p>South Africa</p>
+      <p><a href="mailto:info@ayempire.com">info@ayempire.com</a></p>
+      <p>Need help? Call us<br><a href="tel:+27000000000">+27 61 827 2155</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 AY Empire. All rights reserved.</span>
+    <span class="footer-copy">South African Kayamata Palace</span>
+  </div>
+</footer>
+
+<!-- Floating Cart Link -->
+<a href="cart.html" class="floating-cart-link" aria-label="View cart">
+  <svg class="floating-cart-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6.3 6h15l-1.7 8.2a2 2 0 0 1-2 1.6H9a2 2 0 0 1-2-1.7L5.4 3.8H2.8" />
+    <circle cx="9.4" cy="20" r="1.1" />
+    <circle cx="17.2" cy="20" r="1.1" />
+  </svg>
+  <span class="floating-cart-count">0</span>
+</a>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+  <div class="toast-icon">✅</div>
+  <div class="toast-message" id="toast-message">Item added to cart!</div>
+</div>
+
+<!-- JavaScript -->
+<script src="js/main.js"></script>
+<script src="js/shop.js"></script>
+
+</body>
+</html>

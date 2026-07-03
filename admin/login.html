@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | AY Empire</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .admin-login {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--cream-light);
+      padding: 2rem;
+    }
+    .admin-login-box {
+      background: var(--white);
+      padding: 3rem 2.5rem;
+      border: 1px solid var(--border);
+      max-width: 400px;
+      width: 100%;
+    }
+    .admin-login-box h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      color: var(--brown);
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .admin-login-box p {
+      text-align: center;
+      color: var(--text-mid);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+    .admin-login-box .form-group {
+      margin-bottom: 1.2rem;
+    }
+    .admin-login-box .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-mid);
+      margin-bottom: 0.3rem;
+    }
+    .admin-login-box .form-group input {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+      background: var(--cream-light);
+      transition: border-color 0.2s;
+    }
+    .admin-login-box .form-group input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .admin-login-box .btn-primary {
+      width: 100%;
+      text-align: center;
+      padding: 0.9rem;
+      font-size: 0.9rem;
+    }
+    .admin-login-box .error-msg {
+      color: #e74c3c;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 1rem;
+      display: none;
+    }
+    .admin-login-box .error-msg.show {
+      display: block;
+    }
+    .admin-login-box .success-msg {
+      color: var(--gold-dark);
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 1rem;
+      display: none;
+    }
+    .admin-login-box .success-msg.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-login">
+    <div class="admin-login-box">
+      <h1>AY Empire</h1>
+      <p>Admin Login</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="admin@ayempire.com" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn-primary" id="login-btn">Sign In</button>
+        <div class="error-msg" id="error-msg"></div>
+        <div class="success-msg" id="success-msg">Login successful! Redirecting...</div>
+      </form>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  // ===== SUPABASE CONFIG =====
+  const supabaseUrl = 'https://iirctokpamybsmgzstnj.supabase.co';
+  const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcmN0b2twYW15YnNtZ3pzdG5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MjYwMTksImV4cCI6MjA5ODAwMjAxOX0.eTW0Ipnibowlp3JVewxFnRXcwReKDqiJs8L_X8UfQVc'; // Replace with your anon key
+
+  const _supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+  // ===== DOM ELEMENTS =====
+  const form = document.getElementById('login-form');
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('login-btn');
+  const errorMsg = document.getElementById('error-msg');
+  const successMsg = document.getElementById('success-msg');
+
+  // ===== LOGIN HANDLER =====
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    // Reset messages
+    errorMsg.classList.remove('show');
+    successMsg.classList.remove('show');
+
+    // Validate
+    if (!email || !password) {
+      errorMsg.textContent = 'Please enter both email and password.';
+      errorMsg.classList.add('show');
+      return;
+    }
+
+    // Disable button
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Signing in...';
+
+    try {
+      const { data, error } = await _supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
+
+      if (error) {
+        errorMsg.textContent = error.message || 'Invalid email or password.';
+        errorMsg.classList.add('show');
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Sign In';
+        return;
+      }
+
+      if (data.session) {
+        successMsg.textContent = 'Login successful! Redirecting...';
+        successMsg.classList.add('show');
+        
+        // Store session
+        localStorage.setItem('admin_session', JSON.stringify(data.session));
+        
+        // Redirect to dashboard
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 1500);
+      }
+
+    } catch (err) {
+      errorMsg.textContent = 'Network error. Please try again.';
+      errorMsg.classList.add('show');
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Sign In';
+    }
+  });
+</script>
+</body>
+</html>

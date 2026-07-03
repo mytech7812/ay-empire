@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="canonical" href="https://ayempire.com/success">
+  <title>Order Confirmed | AY Empire</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo.png" alt="AY Empire" style="height: 130px; width: auto; vertical-align: middle; margin-top: 4px; margin-left: -10px;">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Shop</a></li>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#reviews">Testimonials</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- SUCCESS SECTION -->
+<section class="success-section">
+  <div class="success-container">
+
+    <!-- Animated Success Icon -->
+    <div class="success-icon-wrapper">
+      <div class="success-icon">
+        <svg viewBox="0 0 52 52" aria-hidden="true">
+          <circle class="success-circle" cx="26" cy="26" r="25" />
+          <path class="success-check" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+        </svg>
+      </div>
+    </div>
+
+    <h1>Order Confirmed</h1>
+    <p class="success-message">Thank you for your order. We'll send you a confirmation email shortly.</p>
+
+    <div class="order-details" id="order-details">
+      <div class="order-row">
+        <span>Order Number</span>
+        <span id="order-number" class="order-value">Loading...</span>
+      </div>
+      <div class="order-row">
+        <span>Total</span>
+        <span id="order-total" class="order-value">Loading...</span>
+      </div>
+      <div class="order-row">
+        <span>Status</span>
+        <span class="order-status">Paid</span>
+      </div>
+    </div>
+
+    <div class="success-actions">
+      <a href="shop.html" class="btn-primary success-btn">Continue Shopping</a>
+      <a href="index.html" class="btn-secondary">Return Home</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">AY <span>Empire</span></div>
+      <p class="footer-tagline">South African Kayamata Palace — dedicated to supporting your personal, spiritual, and wellness journey through carefully crafted herbal products and traditional spiritual services.</p>
+    </div>
+    <div>
+      <div class="footer-heading">About</div>
+      <ul class="footer-links">
+        <li><a href="#">FAQs</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Help Center</div>
+      <ul class="footer-links">
+        <li><a href="#">Terms &amp; Conditions</a></li>
+        <li><a href="#">Returns &amp; Refunds</a></li>
+        <li><a href="#">Privacy Notice</a></li>
+        <li><a href="#">Shopping</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-heading">Get In Touch</div>
+      <p>South Africa</p>
+      <p><a href="mailto:info@ayempire.com">info@ayempire.com</a></p>
+      <p>Need help? Call us<br><a href="tel:+27000000000">+27 61 827 2155</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 AY Empire. All rights reserved.</span>
+    <span class="footer-copy">South African Kayamata Palace</span>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Clear cart
+    localStorage.removeItem('cart');
+    
+    // Update badge
+    const badge = document.querySelector('.cart-badge');
+    if (badge) {
+      badge.textContent = '0';
+    }
+    
+    // Display order info
+    const urlParams = new URLSearchParams(window.location.search);
+    const reference = urlParams.get('reference');
+    if (reference) {
+      document.getElementById('order-number').textContent = reference;
+    }
+    
+const orderData = JSON.parse(sessionStorage.getItem('orderData'));
+if (orderData) {
+  const currency = orderData.currency || 'NGN';
+  const exchangeRate = orderData.exchangeRate || 1;
+  
+  let displayTotal = orderData.total;
+  let symbol = '₦';
+  
+  if (currency === 'ZAR') {
+    displayTotal = Math.round(orderData.total / exchangeRate);
+    symbol = 'R';
+  } else if (currency === 'USD') {
+    displayTotal = Math.round(orderData.total / exchangeRate);
+    symbol = '$';
+  }
+  
+  document.getElementById('order-total').textContent = symbol + ' ' + displayTotal.toLocaleString();
+}
+  });
+</script>
+
+</body>
+</html>

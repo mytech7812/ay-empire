@@ -1,28 +1,34 @@
 {
-  "routes": [
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
     {
-      "src": "/admin",
-      "dest": "/admin/login.html"
+      "source": "/admin",
+      "destination": "/admin/login",
+      "permanent": false
     },
     {
-      "src": "/admin/dashboard",
-      "dest": "/admin/dashboard.html"
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/admin/login",
+      "destination": "/admin/login.html"
     },
     {
-      "src": "/admin/orders",
-      "dest": "/admin/orders.html"
+      "source": "/admin/dashboard",
+      "destination": "/admin/dashboard.html"
     },
     {
-      "src": "/admin/products",
-      "dest": "/admin/products.html"
+      "source": "/admin/orders",
+      "destination": "/admin/orders.html"
     },
     {
-      "src": "/admin/(.*)",
-      "dest": "/admin/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/admin/products",
+      "destination": "/admin/products.html"
     }
   ]
 }

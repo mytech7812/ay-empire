@@ -1,641 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="google-site-verification" content="ofCz0pR4S5hlWHyT6DqNRs9AC0q8vkNyU7cjOBatm9s" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="google-site-verification" content="ofCz0pR4S5hlWHyT6DqNRs9AC0q8vkNyU7cjOBatm9s" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AY Empire offers authentic kayanmata products, spiritual items, personalized consultations, and wellness guidance for individuals seeking confidence, clarity, and personal growth.">
+  <link rel="canonical" href="https://ayempire.com/">
 
-<meta name="description" content="AY Empire offers authentic kayanmata products, spiritual items, personalized consultations, and wellness guidance for individuals seeking confidence, clarity, and personal growth.">
+  <!-- Schema Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "AY Empire",
+    "url": "https://ayempire.com",
+    "description": "AY Empire offers kayanmata products, spiritual items, consultations, and wellness guidance.",
+    "logo": "https://ayempire.com/images/logo.jpeg"
+  }
+  </script>
 
-<link rel="canonical" href="https://ayempire.com/">
+  <title>AY Empire | Kayanmata Products, Spiritual Consultations & Wellness Support</title>
 
-<!-- ADD THE SCHEMA SCRIPT HERE -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "AY Empire",
-  "url": "https://ayempire.com",
-  "description": "AY Empire offers kayanmata products, spiritual items, consultations, and wellness guidance.",
-  "logo": "https://ayempire.com/images/logo.jpeg"
-}
-</script>
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-<title>AY Empire | Kayanmata Products, Spiritual Consultations & Wellness Support</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-
-<style>
-  :root {
-    --cream: #F5EDE0;
-    --cream-light: #FAF5EE;
-    --gold: #C9A84C;
-    --gold-dark: #A8872E;
-    --gold-light: #E8D08A;
-    --brown: #4A2E1A;
-    --brown-mid: #7A5230;
-    --brown-light: #A87A55;
-    --white: #FDFAF6;
-    --text-dark: #2C1A0E;
-    --text-mid: #6B4A2A;
-    --border: rgba(201,168,76,0.25);
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    font-family: 'Jost', sans-serif;
-    background: var(--cream-light);
-    color: var(--text-dark);
-    overflow-x: hidden;
-    width: 100%;
-  }
-
-  /* ======== NAVBAR ======== */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 999;
-    background: rgba(250,245,238,0.96);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 5%;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 72px;
-  }
-  .nav-logo {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.45rem; font-weight: 700;
-    color: var(--brown); letter-spacing: 0.12em; text-transform: uppercase;
-    text-decoration: none;
-  }
-  .nav-logo span { color: var(--gold); }
-  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-  .nav-links a {
-    font-size: 0.82rem; font-weight: 500; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--text-mid); text-decoration: none;
-    transition: color 0.25s;
-  }
-  .nav-links a:hover { color: var(--gold); }
-  .nav-cta {
-    background: var(--gold); color: var(--white) !important;
-    padding: 0.55rem 1.4rem; border-radius: 2px;
-    font-size: 0.78rem !important; letter-spacing: 0.1em;
-    transition: background 0.25s !important;
-  }
-  .nav-cta:hover { background: var(--gold-dark) !important; color: var(--white) !important; }
-  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
-  .hamburger span { width: 24px; height: 2px; background: var(--brown); display: block; }
-
-  /* ======== HERO ======== */
-  .hero {
-    min-height: 100vh; display: flex;
-    flex-direction: row; align-items: stretch;
-    padding-top: 72px;
-    background: var(--cream-light);
-  }
-.hero-image-col {
-  width: 52%;
-  position: relative;
-  overflow: hidden;
-  min-height: 450px; /* Desktop height */
-}
-
-@media (max-width: 768px) {
-  .hero-image-col {
-    height: 55vh;
-    min-height: 400px; /* Mobile height */
-  }
-}
-  .hero-image-col img {
-    width: 100%; height: 100%; object-fit: cover;
-    object-position: center top;
-    display: block;
-  }
-  .hero-content-col {
-    width: 48%;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 5rem 6% 5rem 5%;
-    background: var(--cream-light);
-  }
-  .hero-eyebrow {
-    font-family: 'Jost', sans-serif;
-    font-size: 0.72rem; font-weight: 600;
-    letter-spacing: 0.25em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 1.2rem;
-    display: flex; align-items: center; gap: 0.8rem;
-  }
-  .hero-eyebrow::before {
-    content: ''; width: 36px; height: 1px; background: var(--gold);
-  }
-  .hero h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(2.4rem, 3.8vw, 3.6rem);
-    font-weight: 600; line-height: 1.15;
-    color: var(--brown); margin-bottom: 1.5rem;
-  }
-  .hero h1 em { color: var(--gold); font-style: italic; }
-  .hero-divider {
-    width: 60px; height: 2px;
-    background: linear-gradient(90deg, var(--gold), transparent);
-    margin-bottom: 1.5rem;
-  }
-  .hero p {
-    font-size: 0.97rem; font-weight: 300; line-height: 1.85;
-    color: var(--text-mid); margin-bottom: 2.4rem; max-width: 480px;
-  }
-  .hero-buttons { display: flex; gap: 1rem; flex-wrap: wrap; }
-  .btn-primary {
-    background: var(--gold);
-    color: var(--white);
-    padding: 0.85rem 2.2rem;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.8rem; font-weight: 600;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    text-decoration: none;
-    border: none; cursor: pointer;
-    transition: background 0.25s, transform 0.2s;
-    display: inline-block;
-  }
-  .btn-primary:hover { background: var(--gold-dark); transform: translateY(-1px); }
-  .btn-secondary {
-    background: transparent;
-    color: var(--brown);
-    padding: 0.82rem 2.2rem;
-    font-family: 'Jost', sans-serif;
-    font-size: 0.8rem; font-weight: 500;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    text-decoration: none;
-    border: 1.5px solid var(--gold);
-    cursor: pointer;
-    transition: all 0.25s;
-    display: inline-block;
-  }
-  .btn-secondary:hover { background: var(--gold); color: var(--white); }
-  .hero-badge {
-    margin-top: 3rem;
-    padding: 1rem 1.4rem;
-    background: rgba(201,168,76,0.08);
-    border-left: 3px solid var(--gold);
-    font-size: 0.82rem; color: var(--text-mid); line-height: 1.6;
-    max-width: 420px;
-  }
-  .hero-badge strong { color: var(--brown); }
-
-  /* ======== SECTION SHARED ======== */
-  section { padding: 6rem 5%; overflow-x: hidden; }
-  .section-eyebrow {
-    font-size: 0.7rem; font-weight: 600;
-    letter-spacing: 0.25em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 0.9rem;
-    display: flex; align-items: center; gap: 0.7rem;
-  }
-  .section-eyebrow::before { content: ''; width: 28px; height: 1px; background: var(--gold); }
-  .section-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(2rem, 3.2vw, 3rem);
-    font-weight: 600; color: var(--brown); line-height: 1.2;
-  }
-  .section-title em { color: var(--gold); font-style: italic; }
-
-  /* ======== TREATMENTS ======== */
-  .treatments { background: var(--cream-light); }
-  .treatments-header {
-    text-align: center; margin-bottom: 3.5rem;
-  }
-  .treatments-header .section-eyebrow { justify-content: center; }
-  .treatments-header .section-eyebrow::before { display: none; }
-  .treatments-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 1.5rem;
-    max-width: 1100px; margin: 0 auto;
-  }
-  .treatment-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    overflow: hidden; text-align: center;
-    transition: transform 0.3s, box-shadow 0.3s;
-    cursor: pointer;
-  }
-  .treatment-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(74,46,26,0.12);
-  }
-  .treatment-img {
-    width: 100%; aspect-ratio: 3/4;
-    background: var(--cream);
-    display: flex; align-items: center; justify-content: center;
-    overflow: hidden; position: relative;
-  }
-  .treatment-img img {
-    width: 100%; height: 100%; object-fit: cover;
-  }
-  .treatment-placeholder {
-    width: 100%; height: 100%;
-    background: linear-gradient(135deg, var(--cream) 0%, #EDE0CE 100%);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 0.6rem;
-  }
-  .treatment-placeholder-icon {
-    width: 44px; height: 44px;
-    background: var(--border);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .treatment-placeholder-icon svg { width: 22px; height: 22px; fill: var(--gold); }
-  .treatment-placeholder-text {
-    font-size: 0.65rem; color: var(--brown-light);
-    letter-spacing: 0.08em; text-transform: uppercase;
-  }
-  .treatment-info { padding: 1rem 0.9rem 1.2rem; }
-  .treatment-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.05rem; font-weight: 600;
-    color: var(--brown); margin-bottom: 0.3rem;
-  }
-  .treatment-sub {
-    font-size: 0.72rem; color: var(--brown-light);
-    letter-spacing: 0.06em;
-  }
-  .treatments-cta { text-align: center; margin-top: 3rem; }
-
-  /* ======== ABOUT ======== */
-  .about { background: var(--white); }
-  .about-inner {
-    display: flex; gap: 6%; align-items: center;
-    max-width: 1200px; margin: 0 auto;
-  }
-  .about-image-wrap {
-    width: 44%; position: relative; flex-shrink: 0;
-  }
-  .about-img-placeholder {
-    width: 100%; aspect-ratio: 3/4;
-    background: linear-gradient(135deg, var(--cream) 0%, #E8D8C4 100%);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    border: 1px solid var(--border);
-    gap: 1rem;
-  }
-  .about-img-placeholder svg { width: 56px; height: 56px; fill: var(--gold-light); }
-  .about-img-placeholder p {
-    font-size: 0.72rem; color: var(--brown-light);
-    letter-spacing: 0.1em; text-transform: uppercase;
-  }
-  .about-gold-accent {
-    position: absolute; bottom: -20px; right: -20px;
-    width: 80px; height: 80px;
-    background: var(--gold);
-    opacity: 0.15;
-  }
-  .about-content { flex: 1; }
-  .about-content .section-eyebrow { margin-bottom: 0.7rem; }
-  .about-content .section-title { margin-bottom: 1.5rem; }
-  .about-body {
-    font-size: 0.95rem; font-weight: 300; line-height: 1.9;
-    color: var(--text-mid); margin-bottom: 1.2rem;
-  }
-  .about-pillars {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 1.2rem; margin: 2rem 0 2.5rem;
-  }
-  .pillar {
-    display: flex; align-items: flex-start; gap: 0.8rem;
-  }
-  .pillar-icon {
-    width: 36px; height: 36px; flex-shrink: 0;
-    background: rgba(201,168,76,0.12);
-    border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .pillar-icon svg { width: 16px; height: 16px; fill: var(--gold); }
-  .pillar-text h4 {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1rem; font-weight: 600;
-    color: var(--brown); margin-bottom: 0.2rem;
-  }
-  .pillar-text p { font-size: 0.8rem; color: var(--text-mid); line-height: 1.55; }
-
-  /* ======== REVIEWS ======== */
-  .reviews { background: var(--cream-light); }
-  .reviews-header { text-align: center; margin-bottom: 3.5rem; }
-  .reviews-header .section-eyebrow { justify-content: center; }
-  .reviews-header .section-eyebrow::before { display: none; }
-  .reviews-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem; max-width: 1200px; margin: 0 auto;
-  }
-  .review-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    padding: 1.8rem 1.6rem;
-    position: relative;
-  }
-  .review-quote {
-    font-size: 3rem; line-height: 1;
-    color: var(--gold); opacity: 0.4;
-    font-family: Georgia, serif;
-    margin-bottom: 0.5rem;
-  }
-  .review-text {
-    font-size: 0.875rem; line-height: 1.8;
-    color: var(--text-mid); font-style: italic;
-    margin-bottom: 1.2rem;
-  }
-  .review-stars { color: var(--gold); font-size: 0.85rem; margin-bottom: 0.6rem; }
-  .review-name {
-    font-size: 0.75rem; font-weight: 600;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--brown-light);
-  }
-
-  /* ======== TRUST STRIP ======== */
-  .trust-strip {
-    background: var(--brown);
-    padding: 2rem 5%;
-    display: flex; align-items: center;
-    justify-content: center; flex-wrap: wrap;
-    gap: 2.5rem;
-  }
-  .trust-item {
-    display: flex; align-items: center; gap: 0.7rem;
-    color: var(--cream-light);
-  }
-  .trust-item svg { width: 20px; height: 20px; fill: var(--gold-light); flex-shrink: 0; }
-  .trust-item span {
-    font-size: 0.78rem; font-weight: 500;
-    letter-spacing: 0.08em; text-transform: uppercase;
-  }
-  .trust-sep {
-    width: 1px; height: 24px;
-    background: rgba(201,168,76,0.3);
-  }
-
-  /* ======== FOOTER ======== */
-  footer {
-    background: var(--text-dark);
-    color: var(--cream-light);
-    padding: 4rem 5% 2rem;
-  }
-  .footer-grid {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
-    gap: 3rem; margin-bottom: 3rem;
-  }
-  .footer-brand-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 1.4rem; font-weight: 700;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    color: var(--cream-light); margin-bottom: 0.8rem;
-  }
-  .footer-brand-name span { color: var(--gold); }
-  .footer-tagline {
-    font-size: 0.82rem; line-height: 1.7;
-    color: rgba(250,245,238,0.55); margin-bottom: 1.5rem;
-  }
-  .footer-heading {
-    font-size: 0.7rem; font-weight: 600;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 1.2rem;
-  }
-  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
-  .footer-links a {
-    font-size: 0.82rem; color: rgba(250,245,238,0.55);
-    text-decoration: none; transition: color 0.2s;
-  }
-  .footer-links a:hover { color: var(--gold-light); }
-  .footer-contact p {
-    font-size: 0.82rem; color: rgba(250,245,238,0.55);
-    line-height: 1.7; margin-bottom: 0.4rem;
-  }
-  .footer-contact a { color: var(--gold-light); text-decoration: none; }
-  .footer-bottom {
-    border-top: 1px solid rgba(201,168,76,0.15);
-    padding-top: 1.5rem;
-    display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 1rem;
-  }
-  .footer-copy {
-    font-size: 0.76rem; color: rgba(250,245,238,0.35);
-  }
-
-  /* ======== TELEGRAM BUTTON ======== */
-  /* ======== WHATSAPP FLOAT BUTTON ======== */
-  .telegram-float {
-    position: fixed; bottom: 32px; right: 32px; z-index: 1000;
-    display: flex; align-items: center; gap: 0.7rem;
-    background: #25D366; color: #fff;
-    padding: 0.75rem 1.3rem;
-    text-decoration: none;
-    font-size: 0.8rem; font-weight: 600;
-    letter-spacing: 0.06em;
-    box-shadow: 0 6px 24px rgba(37,211,102,0.4);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  .telegram-float:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 32px rgba(37,211,102,0.5);
-  }
-  .telegram-float svg { width: 20px; height: 20px; fill: #fff; }
-
-  /* ======== MOBILE ======== */
-  @media (max-width: 900px) {
-    .hero { flex-direction: column; }
-    .hero-image-col { width: 100%; min-height: 350px; }
-    .hero-content-col { width: 100%; padding: 3rem 6%; }
-    .about-inner { flex-direction: column; }
-    .about-image-wrap { width: 100%; margin-bottom: 2rem; }
-    .footer-grid { grid-template-columns: 1fr 1fr; }
-    .nav-links { display: none; flex-direction: column; }
-    .hamburger { display: flex; }
-  }
-  
-  @media (max-width: 768px) {
-    body { overflow-x: hidden; }
-    .treatments-grid { 
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.8rem;
-      padding: 0 0.5rem;
-    }
-    .treatment-card { width: 100%; }
-    .treatment-name { font-size: 0.9rem; }
-    .treatment-sub { font-size: 0.65rem; }
-    .about-pillars { grid-template-columns: 1fr; }
-    .trust-sep { display: none; }
-    .trust-strip { gap: 1rem; padding: 1rem 5%; }
-    .trust-item span { font-size: 0.7rem; }
-    .hero-buttons { flex-direction: column; width: 100%; }
-    .btn-primary, .btn-secondary { text-align: center; width: 100%; }
-    section { padding: 3rem 4%; }
-    .footer-grid { grid-template-columns: 1fr; gap: 1.5rem; }
-    .hero-image-col { height: 55vh; min-height: 400px; }
-    .hero-image-col img { object-position: center 45%; }
-    .telegram-float { bottom: 16px; right: 16px; padding: 0.5rem 1rem; font-size: 0.7rem; }
-    .hero h1 { font-size: 2rem; }
-    .hero p { font-size: 0.9rem; }
-    .section-title { font-size: 1.8rem; }
-    .reviews-grid { grid-template-columns: 1fr; padding: 0 0.5rem; }
-    .review-card { padding: 1.2rem; }
-    .about-body { font-size: 0.9rem; }
-  }
-  
-  @media (max-width: 480px) {
-    .treatments-grid { gap: 0.5rem; }
-    .treatment-info { padding: 0.5rem; }
-    .treatment-name { font-size: 0.8rem; }
-    .hero-content-col { padding: 2rem 5%; }
-    .hero-badge { font-size: 0.75rem; padding: 0.8rem; }
-  }
- .treatments-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-}
-
-@media (max-width: 768px) {
-  .treatments-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-/* Add this to your existing CSS */
-
-@media (max-width: 768px) {
-  .span-2-mobile {
-    grid-column: span 2;
-    grid-row: span 2;
-  }
-  
-  .span-2-mobile .treatment-img {
-    aspect-ratio: 3/2;
-    height: auto;
-  }
-  
-  .span-2-mobile .treatment-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-/* TIKTOK FLOAT BUTTON */
-.tiktok-float {
-  position: fixed;
-  bottom: 100px;
-  right: 32px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  background: #000000;
-  color: #fff;
-  padding: 0.75rem 1.3rem;
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  border-radius: 50px;
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.tiktok-float:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
-}
-.tiktok-float svg {
-  width: 20px;
-  height: 20px;
-  fill: #fff;
-}
-
-/* Adjust WhatsApp button position */
-.telegram-float {
-  bottom: 32px;
-}
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-  .tiktok-float {
-    bottom: 85px;
-    right: 16px;
-    padding: 0.5rem 1rem;
-    font-size: 0.7rem;
-  }
-  .telegram-float {
-    bottom: 16px;
-    right: 16px;
-    padding: 0.5rem 1rem;
-    font-size: 0.7rem;
-  }
-}
-/* INSTAGRAM FLOAT BUTTON */
-.instagram-float {
-  position: fixed;
-  bottom: 168px;
-  right: 32px;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 0.7rem;
-  background: #E4405F;
-  color: #fff;
-  padding: 0.75rem 1.3rem;
-  text-decoration: none;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  border-radius: 50px;
-  box-shadow: 0 6px 24px rgba(228, 64, 95, 0.4);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.instagram-float:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 32px rgba(228, 64, 95, 0.5);
-}
-.instagram-float svg {
-  width: 20px;
-  height: 20px;
-  fill: #fff;
-}
-
-/* Adjust TikTok button position */
-.tiktok-float {
-  bottom: 100px;
-}
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-  .instagram-float {
-    bottom: 145px;
-    right: 16px;
-    padding: 0.5rem 1rem;
-    font-size: 0.7rem;
-  }
-  .tiktok-float {
-    bottom: 85px;
-    right: 16px;
-    padding: 0.5rem 1rem;
-    font-size: 0.7rem;
-  }
-  .telegram-float {
-    bottom: 16px;
-    right: 16px;
-    padding: 0.5rem 1rem;
-    font-size: 0.7rem;
-  }
-}
-
-</style>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
 <!-- NAVBAR -->
 <nav>
-<a href="#" class="nav-logo">AY <span>Empire</span></a>  
+<a href="index.html" class="nav-logo">
+  <img src="images/logo.png" alt="AY Empire" style="height: 120px; width: auto; vertical-align: middle; margin-top: 4px; margin-left: -10px;">
+</a>
   <ul class="nav-links">
     <li><a href="#">Home</a></li>
     <li><a href="#about">About</a></li>
     <li><a href="#treatments">Services</a></li>
     <li><a href="#reviews">Testimonials</a></li>
-    <li><a href="#" class="nav-cta">Contact</a></li>
+    <li><a href="contact.html">Contact Us</a></li>
   </ul>
   <div class="hamburger">
     <span></span><span></span><span></span>
@@ -675,131 +78,154 @@
 
   <div class="treatments-grid">
 
-<!-- Card 1 -->
-<div class="treatment-card">
-  <div class="treatment-img">
-    <img src="images/curse.jpg" alt="Curse Breaker" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Curse Breaker</div>
-    <div class="treatment-sub">Breaking Generational Curses</div>
-  </div>
-</div>
 
-<!-- Card 2 -->
-<div class="treatment-card">
-  <div class="treatment-img">
-    <img src="images/treatment.jpg" alt="Spiritual Cleansing" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Attraction perfume</div>
-    <div class="treatment-sub">Love &amp; attraction</div>
-  </div>
-</div>
+  <!-- Card 1 - Curse Breaker -->
+  <a href="product.html?id=curse-breaker" class="treatment-card-link">
+    <div class="treatment-card">
+      <div class="treatment-img">
+        <img src="images/curse.jpg" alt="Curse Breaker" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Curse Breaker</div>
+        <div class="treatment-sub">Breaking Generational Curses</div>
+      </div>
+    </div>
+  </a>
 
-<!-- Card 3 -->
-<div class="treatment-card">
-  <div class="treatment-img">
-    <img src="images/kayanmata.jpg" alt="Kayamata Products" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Business Booster</div>
-    <div class="treatment-sub">Success &amp; Prosperity</div>
-  </div>
-</div>
+  <!-- Card 2 - Attraction Perfume -->
+  <a href="product.html?id=attraction-perfume" class="treatment-card-link">
+    <div class="treatment-card">
+      <div class="treatment-img">
+        <img src="images/treatment.jpg" alt="Attraction Perfume" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Attraction Perfume</div>
+        <div class="treatment-sub">Love &amp; Attraction</div>
+      </div>
+    </div>
+  </a>
 
-<!-- Card 4 -->
-<div class="treatment-card">
-  <div class="treatment-img">
-    <img src="images/attraction.jpg" alt="Attraction Perfume" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Seduction Oil</div>
-    <div class="treatment-sub">Men Attraction</div>
-  </div>
-</div>
+  <!-- Card 3 - Business Booster -->
+  <a href="product.html?id=business-booster" class="treatment-card-link">
+    <div class="treatment-card">
+      <div class="treatment-img">
+        <img src="images/kayanmata.jpg" alt="Business Booster" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Business Booster</div>
+        <div class="treatment-sub">Success &amp; Prosperity</div>
+      </div>
+    </div>
+  </a>
 
-<!-- Card 5 -->
-<div class="treatment-card">
-  <div class="treatment-img">
-    <img src="images/wayopener.jpg" alt="Divine Help Way Opener" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Divine Help (Way Opener)</div>
-    <div class="treatment-sub">Open Doors &amp; Divine Favour</div>
-  </div>
-</div>
+  <!-- Card 4 - Seduction Oil -->
+  <a href="product.html?id=seduction-oil" class="treatment-card-link">
+    <div class="treatment-card">
+      <div class="treatment-img">
+        <img src="images/attraction.jpg" alt="Seduction Oil" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Seduction Oil</div>
+        <div class="treatment-sub">Men Attraction</div>
+      </div>
+    </div>
+  </a>
 
-  <!-- Card 6 -->
-<div class="treatment-card">
-  <div class="treatment-img">
-    <img src="images/consult.jpg" alt="Prayer &amp; Consultation" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Prayer &amp; Consultation</div>
-    <div class="treatment-sub">Spiritual Guidance Sessions</div>
-  </div>
-</div>
+  <!-- Card 5 - Divine Help -->
+  <a href="product.html?id=divine-help" class="treatment-card-link">
+    <div class="treatment-card">
+      <div class="treatment-img">
+        <img src="images/wayopener.jpg" alt="Divine Help Way Opener" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Divine Help (Way Opener)</div>
+        <div class="treatment-sub">Open Doors &amp; Divine Favour</div>
+      </div>
+    </div>
+  </a>
 
-<!-- Card 7 -->
-<div class="treatment-card">
-  <div class="treatment-img">
-    <img src="images/favourr.jpg" alt="Favour Kit" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Presidential Favour Kit</div>
-    <div class="treatment-sub">Divine Favour, money attraction &amp; Breakthrough</div>
-  </div>
-</div>
+  <!-- Card 6 - Prayer & Consultation -->
+  <a href="product.html?id=prayer-consultation" class="treatment-card-link">
+    <div class="treatment-card">
+      <div class="treatment-img">
+        <img src="images/consult.jpg" alt="Prayer & Consultation" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Prayer &amp; Consultation</div>
+        <div class="treatment-sub">Spiritual Guidance Sessions</div>
+      </div>
+    </div>
+  </a>
 
-<!-- Card 8 -->
-<div class="treatment-card">
-  <div class="treatment-img">
-    <img src="images/wellness.jfif" alt="Men's Wellness" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Men's Wellness</div>
-    <div class="treatment-sub">Strength &amp; Vitality Herbs</div>
-  </div>
-</div>
+  <!-- Card 7 - Presidential Favour Kit -->
+  <a href="product.html?id=presidential-favour" class="treatment-card-link">
+    <div class="treatment-card">
+      <div class="treatment-img">
+        <img src="images/favourr.jpg" alt="Presidential Favour Kit" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Presidential Favour Kit</div>
+        <div class="treatment-sub">Divine Favour, Money Attraction &amp; Breakthrough</div>
+      </div>
+    </div>
+  </a>
 
-<!-- Card 9 - Cleansing Kit -->
-<div class="treatment-card">
-  <div class="treatment-img">
-    <img src="images/cleansingkit.jpg" alt="Cleansing Kit" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Cleansing Kit</div>
-    <div class="treatment-sub">Complete Spiritual Cleansing</div>
-  </div>
-</div>
+  <!-- Card 8 - Men's Wellness -->
+  <a href="product.html?id=mens-wellness" class="treatment-card-link">
+    <div class="treatment-card">
+      <div class="treatment-img">
+        <img src="images/wellness.jfif" alt="Men's Wellness" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Men's Wellness</div>
+        <div class="treatment-sub">Strength &amp; Vitality Herbs</div>
+      </div>
+    </div>
+  </a>
 
-<!-- Card 10 - Bonding Kit -->
-<div class="treatment-card">
-  <div class="treatment-img">
-    <img src="images/favour.jpg" alt="Bonding Kit" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Bonding Kit</div>
-    <div class="treatment-sub">Love Bonding</div>
-  </div>
-</div>
+  <!-- Card 9 - Cleansing Kit -->
+  <a href="product.html?id=cleansing-kit" class="treatment-card-link">
+    <div class="treatment-card">
+      <div class="treatment-img">
+        <img src="images/cleansingkit.jpg" alt="Cleansing Kit" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Cleansing Kit</div>
+        <div class="treatment-sub">Complete Spiritual Cleansing</div>
+      </div>
+    </div>
+  </a>
 
-<!-- Card 9 - Spiritual Cleansing (spans 2 columns on mobile) -->
-<div class="treatment-card span-2-mobile">
-  <div class="treatment-img">
-    <img src="images/cleansing.jpg" alt="Spiritual Cleansing" style="width: 100%; height: 100%; object-fit: cover;">
-  </div>
-  <div class="treatment-info">
-    <div class="treatment-name">Spiritual Cleansing</div>
-    <div class="treatment-sub">Protection &amp; Spiritual Works</div>
-  </div>
-</div>
+  <!-- Card 10 - Bonding Kit -->
+  <a href="product.html?id=bonding-kit" class="treatment-card-link">
+    <div class="treatment-card">
+      <div class="treatment-img">
+        <img src="images/favour.jpg" alt="Bonding Kit" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Bonding Kit</div>
+        <div class="treatment-sub">Love Bonding</div>
+      </div>
+    </div>
+  </a>
+
+  <!-- Card 11 - Spiritual Cleansing (spans 2 columns on mobile) -->
+  <a href="product.html?id=spiritual-cleansing" class="treatment-card-link span-2-mobile-link">
+    <div class="treatment-card span-2-mobile">
+      <div class="treatment-img">
+        <img src="images/cleansing.jpg" alt="Spiritual Cleansing" style="width: 100%; height: 100%; object-fit: cover;">
+      </div>
+      <div class="treatment-info">
+        <div class="treatment-name">Spiritual Cleansing</div>
+        <div class="treatment-sub">Protection &amp; Spiritual Works</div>
+      </div>
+    </div>
+  </a>
 
 </div> <!-- Close treatments-grid -->
 
 <div class="treatments-cta">
-  <a href="#" class="btn-primary">View All Products</a>
+  <a href="shop.html" class="btn-primary">View All Products</a>
 </div>
 </section>
 
@@ -978,9 +404,9 @@
       <div class="footer-heading">About</div>
       <ul class="footer-links">
         <li><a href="#">FAQs</a></li>
-        <li><a href="#">Shop</a></li>
-        <li><a href="#">About Us</a></li>
-        <li><a href="#">Contact Us</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="index.html#about">About Us</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
       </ul>
     </div>
     <div>
@@ -1005,55 +431,14 @@
   </div>
 </footer>
 
-<!-- INSTAGRAM FLOAT BUTTON -->
-<a href="https://www.instagram.com/southafrican_kayamata_palace?igsh=MWVpY2pibTVlemZhag%3D%3D&utm_source=qr" target="_blank" class="instagram-float" aria-label="View our IG page">
-  <svg viewBox="0 0 24 24" fill="white">
-    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
-  </svg>
-  View our IG page
-</a>
 
-<!-- TIKTOK FLOAT BUTTON -->
-<a href="https://www.tiktok.com/@southafrican_kayamata_?_r=1&_t=ZS-97LFaBHtfKX" target="_blank" class="tiktok-float" aria-label="Follow us on TikTok">
-  <svg viewBox="0 0 24 24" fill="white">
-    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-5.2 1.74 2.89 2.89 0 012.31-4.64 2.93 2.93 0 01.88.13V9.4a6.84 6.84 0 00-.88-.05 6.34 6.34 0 00-6.33 6.33A6.34 6.34 0 009.32 21.5a6.34 6.34 0 006.33-6.33v-3.48a10.71 10.71 0 006.23 2.11V11.5a6.34 6.34 0 01-2.29-4.81z"/>
-  </svg>
-  Follow us on TikTok
-</a>
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+  <div class="toast-icon">✅</div>
+  <div class="toast-message" id="toast-message">Item added to cart!</div>
+</div>
 
-<!-- WHATSAPP FLOAT BUTTON -->
-<a href="https://wa.me/message/FB7FUV772WMUE1" target="_blank" class="telegram-float" aria-label="Chat on WhatsApp">
-  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-  Chat us on WhatsApp
-</a>
-
-<script>
-  // Smooth scroll for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      const target = this.getAttribute('href');
-      if (target && target !== '#' && document.querySelector(target)) {
-        e.preventDefault();
-        document.querySelector(target).scrollIntoView({ behavior: 'smooth' });
-      }
-    });
-  });
-  // Hamburger placeholder
-  document.querySelector('.hamburger')?.addEventListener('click', function() {
-    const links = document.querySelector('.nav-links');
-    if (links.style.display === 'flex') {
-      links.style.display = 'none';
-    } else {
-      links.style.display = 'flex';
-      links.style.position = 'absolute';
-      links.style.top = '72px';
-      links.style.left = '0'; links.style.right = '0';
-      links.style.background = 'var(--cream-light)';
-      links.style.padding = '1.5rem 5%';
-      links.style.borderBottom = '1px solid var(--border)';
-    }
-  });
-</script>
+<script src="js/main.js"></script>
 
 </body>
 </html>

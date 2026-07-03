@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="View product details for AY Empire's spiritual and wellness products.">
+  <link rel="canonical" href="https://ayempire.com/product">
+
+  <title>Product Details | AY Empire</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo.png" alt="AY Empire" style="height: 130px; width: auto; vertical-align: middle; margin-top: 4px; margin-left: -10px;">
+  </a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Shop</a></li>
+    <li><a href="index.html#about">About</a></li>
+    <li><a href="index.html#reviews">Testimonials</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <div class="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- PRODUCT DETAIL -->
+<section class="product-detail">
+  <div class="product-detail-container">
+
+    <!-- Product Actions -->
+    <div class="product-detail-actions">
+      <a href="shop.html" class="back-link">&larr; Back to Shop</a>
+      <div class="product-currency-selector">
+        <span class="currency-label">Currency:</span>
+        <div class="currency-selector">
+          <button class="currency-btn" id="currency-btn">
+            <span id="currency-display">&#8358; NGN</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </button>
+          <div class="currency-dropdown" id="currency-dropdown">
+            <button class="currency-option" data-currency="NGN">&#8358; NGN</button>
+            <button class="currency-option" data-currency="ZAR">R ZAR</button>
+            <button class="currency-option" data-currency="USD">$ USD</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Layout -->
+    <div class="product-detail-grid">
+
+      <!-- Left: Product Image Column -->
+      <div class="product-image-col">
+        <img src="" alt="" id="product-image" />
+      </div>
+
+      <!-- Right: Product Info -->
+      <div class="product-info-col">
+        <span class="product-category" id="product-category">Loading...</span>
+        <h1 class="product-name" id="product-name">Loading...</h1>
+
+        <div class="product-price" id="product-price">Loading...</div>
+
+        <p class="product-description" id="product-description">
+          Loading product details...
+        </p>
+
+        <!-- Quantity Selector -->
+        <div class="product-quantity">
+          <label for="quantity">Quantity</label>
+          <div class="quantity-selector">
+            <button class="qty-btn" id="qty-decrease">−</button>
+            <input type="number" id="quantity" value="1" min="1" max="99">
+            <button class="qty-btn" id="qty-increase">+</button>
+          </div>
+        </div>
+
+        <!-- Add to Cart Button -->
+        <button class="btn-primary add-to-cart-btn" id="add-to-cart">
+          Add to Cart
+        </button>
+
+        <!-- Product Meta -->
+        <div class="product-meta">
+          <p><strong>Category:</strong> <span id="meta-category">Loading...</span></p>
+          <p><strong>Availability:</strong> <span id="meta-stock">Loading...</span></p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">AY <span>Empire</span></div>
+      <p class="footer-tagline">South African Kayamata Palace — dedicated to supporting your personal, spiritual, and wellness journey through carefully crafted herbal products and traditional spiritual services.</p>
+    </div>
+    <div>
+      <div class="footer-heading">About</div>
+      <ul class="footer-links">
+        <li><a href="#">FAQs</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-heading">Help Center</div>
+      <ul class="footer-links">
+        <li><a href="#">Terms &amp; Conditions</a></li>
+        <li><a href="#">Returns &amp; Refunds</a></li>
+        <li><a href="#">Privacy Notice</a></li>
+        <li><a href="#">Shopping</a></li>
+      </ul>
+    </div>
+    <div class="footer-contact">
+      <div class="footer-heading">Get In Touch</div>
+      <p>South Africa</p>
+      <p><a href="mailto:info@ayempire.com">info@ayempire.com</a></p>
+      <p>Need help? Call us<br><a href="tel:+27000000000">+27 61 827 2155</a></p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2025 AY Empire. All rights reserved.</span>
+    <span class="footer-copy">South African Kayamata Palace</span>
+  </div>
+</footer>
+
+<!-- Floating Cart Link -->
+<a href="cart.html" class="floating-cart-link" aria-label="View cart">
+  <svg class="floating-cart-icon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M6.3 6h15l-1.7 8.2a2 2 0 0 1-2 1.6H9a2 2 0 0 1-2-1.7L5.4 3.8H2.8" />
+    <circle cx="9.4" cy="20" r="1.1" />
+    <circle cx="17.2" cy="20" r="1.1" />
+  </svg>
+  <span class="floating-cart-count">0</span>
+</a>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+  <div class="toast-icon">✅</div>
+  <div class="toast-message" id="toast-message">Item added to cart!</div>
+</div>
+
+<!-- JavaScript -->
+<script src="js/main.js"></script>
+<script src="js/product.js"></script>
+
+</body>
+</html>

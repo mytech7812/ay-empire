@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders | Admin Panel</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- Admin Nav -->
+  <nav class="admin-nav">
+    <a href="dashboard.html" class="admin-nav-brand">AY Empire <span>Admin</span></a>
+    <ul class="admin-nav-links">
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="orders.html" class="active">Orders</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="#" id="logout-btn">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Orders Content -->
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Orders</h1>
+      <p>View and manage all customer orders.</p>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="admin-filters">
+      <select id="status-filter">
+        <option value="all">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="paid">Paid</option>
+        <option value="shipped">Shipped</option>
+        <option value="delivered">Delivered</option>
+        <option value="failed">Failed</option>
+      </select>
+      <input type="text" id="search-orders" placeholder="Search by name or order #...">
+      <button class="btn-primary" id="refresh-btn">Refresh</button>
+    </div>
+
+    <!-- Orders Grid -->
+    <div class="orders-grid" id="orders-grid">
+      <!-- Orders will be rendered here -->
+    </div>
+  </main>
+
+  <!-- Order Detail Modal (Keep the same) -->
+  <div class="modal" id="order-modal">
+    <div class="modal-content">
+      <span class="modal-close" id="modal-close">&times;</span>
+      <h2 id="modal-order-number">Order #</h2>
+      <div id="modal-order-details"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="admin.js"></script>
+  <script src="orders.js"></script>
+</body>
+</html>
