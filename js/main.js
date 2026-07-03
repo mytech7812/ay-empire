@@ -126,22 +126,8 @@ document.addEventListener('click', function(e) {
   }
 });
 
-// ===== CURRENCY AUTO-DETECT =====
-async function detectUserCurrency() {
-  try {
-    const response = await fetch('https://ipapi.co/json/');
-    const data = await response.json();
-    const country = data.country_code;
-    
-    if (country === 'ZA') {
-      return 'ZAR';
-    }
-    return 'NGN';
-  } catch (error) {
-    console.error('Currency detection failed:', error);
-    return 'NGN';
-  }
-}
+// ===== CURRENCY SYSTEM (SIMPLIFIED) =====
+let currentCurrency = 'NGN';
 
 // ===== FETCH RATES FROM SUPABASE =====
 async function fetchRatesFromSupabase() {
@@ -150,11 +136,11 @@ async function fetchRatesFromSupabase() {
     const data = await response.json();
     
     if (data.success && data.rates) {
-      if (data.rates.zar_rate) {
-        localStorage.setItem('exchange_rate_zar', data.rates.zar_rate);
+      if (data.rates.exchange_rate_zar) {
+        localStorage.setItem('exchange_rate_zar', data.rates.exchange_rate_zar);
       }
-      if (data.rates.usd_rate) {
-        localStorage.setItem('exchange_rate_usd', data.rates.usd_rate);
+      if (data.rates.exchange_rate_usd) {
+        localStorage.setItem('exchange_rate_usd', data.rates.exchange_rate_usd);
       }
       return data.rates;
     }
@@ -164,17 +150,15 @@ async function fetchRatesFromSupabase() {
   return null;
 }
 
-// ===== CURRENCY SYSTEM =====
-let currentCurrency = 'NGN';
-let exchangeRates = { ZAR: 55, USD: 1400 };
-
 function getExchangeRate(currency) {
   if (currency === 'ZAR') {
-    return parseInt(localStorage.getItem('exchange_rate_zar')) || 55;
+    const stored = localStorage.getItem('exchange_rate_zar');
+    return stored ? parseInt(stored) : 84; // Fallback: 84 NGN = 1 ZAR
   } else if (currency === 'USD') {
-    return parseInt(localStorage.getItem('exchange_rate_usd')) || 1400;
+    const stored = localStorage.getItem('exchange_rate_usd');
+    return stored ? parseInt(stored) : 1400; // Fallback: 1400 NGN = 1 USD
   }
-  return 1;
+  return 1; // NGN is base
 }
 
 function formatPrice(priceNgn, currency) {
@@ -224,16 +208,11 @@ function updatePrices(currency) {
 
 // ===== INITIALIZE CURRENCY SYSTEM =====
 async function initCurrency() {
-  // Fetch rates from Supabase first
+  // Fetch rates from Supabase
   await fetchRatesFromSupabase();
   
-  let preferredCurrency = localStorage.getItem('user_currency');
-  
-  if (!preferredCurrency) {
-    preferredCurrency = await detectUserCurrency();
-    localStorage.setItem('user_currency', preferredCurrency);
-  }
-  
+  // Use stored preference or default to NGN
+  const preferredCurrency = localStorage.getItem('user_currency') || 'NGN';
   currentCurrency = preferredCurrency;
   
   const display = document.getElementById('currency-display');
