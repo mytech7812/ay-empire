@@ -36,26 +36,27 @@ function updateMobileCartBadge() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   let mobileCartLink = document.querySelector('.mobile-cart-link');
 
-if (!mobileCartLink) {
-  mobileCartLink = document.createElement('a');
-  mobileCartLink.href = 'cart.html';
-  mobileCartLink.className = 'mobile-cart-link';
-  mobileCartLink.setAttribute('aria-label', 'View cart');
-  mobileCartLink.innerHTML = `
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="9" cy="21" r="1"/>
-      <circle cx="20" cy="21" r="1"/>
-      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-    </svg>
-    <span class="mobile-cart-count">0</span>
-  `;
-  nav.insertBefore(mobileCartLink, hamburger);
-}
+  if (!mobileCartLink) {
+    mobileCartLink = document.createElement('a');
+    mobileCartLink.href = 'cart.html';
+    mobileCartLink.className = 'mobile-cart-link';
+    mobileCartLink.setAttribute('aria-label', 'View cart');
+    mobileCartLink.innerHTML = `
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="21" r="1"/>
+        <circle cx="20" cy="21" r="1"/>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+      </svg>
+      <span class="mobile-cart-count">0</span>
+    `;
+    nav.insertBefore(mobileCartLink, hamburger);
+  }
 
   mobileCartLink.querySelector('.mobile-cart-count').textContent = totalItems;
 }
 
 updateMobileCartBadge();
+
 function getCartItemCount() {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
   return cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -97,7 +98,6 @@ function showToast(message, icon = '\u2713') {
   
   if (!toast) return;
   
-  // Set message
   if (toastMessage) {
     toastMessage.innerHTML = message;
   }
@@ -105,18 +105,15 @@ function showToast(message, icon = '\u2713') {
     toastIcon.textContent = icon;
   }
   
-  // Show toast
   toast._shownAt = Date.now();
   toast.classList.add('show');
   
-  // Auto-hide after 3 seconds
   clearTimeout(toast._timeout);
   toast._timeout = setTimeout(() => {
     toast.classList.remove('show');
   }, 3000);
 }
 
-// Close toast when clicking anywhere outside it
 document.addEventListener('click', function(e) {
   const toast = document.getElementById('toast');
   if (
@@ -128,6 +125,44 @@ document.addEventListener('click', function(e) {
     toast.classList.remove('show');
   }
 });
+
+// ===== CURRENCY AUTO-DETECT =====
+async function detectUserCurrency() {
+  try {
+    const response = await fetch('https://ipapi.co/json/');
+    const data = await response.json();
+    const country = data.country_code;
+    
+    if (country === 'ZA') {
+      return 'ZAR';
+    }
+    return 'NGN';
+  } catch (error) {
+    console.error('Currency detection failed:', error);
+    return 'NGN';
+  }
+}
+
+// ===== FETCH RATES FROM SUPABASE =====
+async function fetchRatesFromSupabase() {
+  try {
+    const response = await fetch('https://iirctokpamybsmgzstnj.supabase.co/functions/v1/rates');
+    const data = await response.json();
+    
+    if (data.success && data.rates) {
+      if (data.rates.zar_rate) {
+        localStorage.setItem('exchange_rate_zar', data.rates.zar_rate);
+      }
+      if (data.rates.usd_rate) {
+        localStorage.setItem('exchange_rate_usd', data.rates.usd_rate);
+      }
+      return data.rates;
+    }
+  } catch (error) {
+    console.error('Failed to fetch rates from Supabase:', error);
+  }
+  return null;
+}
 
 // ===== CURRENCY SYSTEM =====
 let currentCurrency = 'NGN';
@@ -164,13 +199,11 @@ function updatePrices(currency) {
     display.textContent = symbols[currency] || '₦ NGN';
   }
   
-  // Update all price elements
   document.querySelectorAll('[data-price-ngn]').forEach(el => {
     const priceNgn = parseInt(el.dataset.priceNgn);
     el.textContent = formatPrice(priceNgn, currency);
   });
   
-  // Update shop page prices
   document.querySelectorAll('.product-price-shop').forEach(el => {
     const priceNgn = parseInt(el.dataset.priceNgn);
     if (priceNgn) {
@@ -178,7 +211,6 @@ function updatePrices(currency) {
     }
   });
   
-  // Update product detail price
   const productPrice = document.getElementById('product-price');
   if (productPrice) {
     const priceNgn = parseInt(productPrice.dataset.priceNgn);
@@ -189,36 +221,31 @@ function updatePrices(currency) {
   
   localStorage.setItem('user_currency', currency);
 }
-// Initialize currency system
+
+// ===== INITIALIZE CURRENCY SYSTEM =====
 async function initCurrency() {
-  // Get exchange rate from localStorage
-  exchangeRate = getExchangeRate();
+  // Fetch rates from Supabase first
+  await fetchRatesFromSupabase();
   
-  // Check for stored preference
   let preferredCurrency = localStorage.getItem('user_currency');
   
   if (!preferredCurrency) {
-    // Auto-detect
     preferredCurrency = await detectUserCurrency();
     localStorage.setItem('user_currency', preferredCurrency);
   }
   
-  // Set initial currency
   currentCurrency = preferredCurrency;
   
-  // Update UI
   const display = document.getElementById('currency-display');
   if (display) {
     display.textContent = currentCurrency === 'NGN' ? '₦ NGN' : 'R ZAR';
   }
   
-  // Update prices
   updatePrices(currentCurrency);
 }
 
 // ===== CURRENCY DROPDOWN EVENTS =====
 document.addEventListener('DOMContentLoaded', function() {
-  // Currency button toggle
   const currencyBtn = document.getElementById('currency-btn');
   const currencyDropdown = document.getElementById('currency-dropdown');
   
@@ -229,7 +256,6 @@ document.addEventListener('DOMContentLoaded', function() {
       currencyBtn.classList.toggle('active');
     });
     
-    // Close dropdown when clicking outside
     document.addEventListener('click', function(e) {
       if (!currencyBtn.contains(e.target) && !currencyDropdown.contains(e.target)) {
         currencyDropdown.classList.remove('show');
@@ -237,25 +263,21 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // Currency option click
     document.querySelectorAll('.currency-option').forEach(option => {
       option.addEventListener('click', function() {
         const currency = this.dataset.currency;
         updatePrices(currency);
         
-        // Update active state
         document.querySelectorAll('.currency-option').forEach(opt => {
           opt.classList.remove('active');
         });
         this.classList.add('active');
         
-        // Close dropdown
         currencyDropdown.classList.remove('show');
         currencyBtn.classList.remove('active');
       });
     });
   }
   
-  // Initialize currency
   initCurrency();
 });

@@ -124,14 +124,9 @@ document.addEventListener('DOMContentLoaded', async function() {
   // Store current product for add to cart
   window.currentProduct = product;
 
-  // Smart back button
+  // Keep the product page back action consistent on live clean URLs.
   const backLink = document.querySelector('.back-link');
-  const referrer = document.referrer;
-  if (referrer.includes('shop.html')) {
-    backLink.href = 'shop.html';
-  } else if (referrer.includes('index.html') || referrer.includes('ayempire.com')) {
-    backLink.href = 'index.html#treatments';
-  } else {
+  if (backLink) {
     backLink.href = 'shop.html';
   }
 

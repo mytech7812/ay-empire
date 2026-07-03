@@ -2,7 +2,7 @@
 // Supabase config is already in admin.js - using _supabase globally
 
 // ===== EXCHANGE RATES =====
-let currentExchangeRate = 55; // ZAR fallback
+let currentExchangeRate = 84; // ZAR fallback (84 NGN = 1 ZAR)
 let currentUsdRate = 1400;    // USD fallback
 const PRODUCTS_CACHE_KEY = 'ay_empire_products_cache_v1';
 
@@ -14,35 +14,82 @@ function clearPublicProductsCache() {
   }
 }
 
-// ===== FETCH EXCHANGE RATE — CHECK LOCALSTORAGE FIRST =====
+// ===== GET RATE FROM SUPABASE =====
+async function getExchangeRateFromDB() {
+  try {
+    const { data, error } = await _supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'exchange_rate_zar')
+      .single();
+    
+    if (error) throw error;
+    return parseInt(data.value) || 84;
+  } catch (error) {
+    console.error('Error fetching rate from Supabase:', error);
+    return null;
+  }
+}
+
+// ===== UPDATE RATE IN SUPABASE =====
+async function updateExchangeRateInDB(newRate) {
+  try {
+    const { error } = await _supabase
+      .from('settings')
+      .update({ value: newRate.toString(), updated_at: new Date().toISOString() })
+      .eq('key', 'exchange_rate_zar');
+    
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error updating rate:', error);
+    return false;
+  }
+}
+
+// ===== FETCH EXCHANGE RATE — CHECK SUPABASE FIRST =====
 async function fetchExchangeRate() {
-  // Priority 2: Check if dashboard rate exists in localStorage
+  try {
+    // Priority 1: Fetch from Supabase (synced across all devices)
+    const rate = await getExchangeRateFromDB();
+    if (rate && rate > 0) {
+      currentExchangeRate = rate;
+      localStorage.setItem('exchange_rate_zar', rate.toString());
+      updateRateDisplay();
+      updateRateDisplayInForm();
+      return currentExchangeRate;
+    }
+  } catch (error) {
+    console.error('Failed to fetch rate from Supabase:', error);
+  }
+
+  // Priority 2: Check if dashboard rate exists in localStorage (fallback)
   const dashboardRate = localStorage.getItem('exchange_rate_zar');
   if (dashboardRate) {
     currentExchangeRate = parseInt(dashboardRate);
     updateRateDisplay();
+    updateRateDisplayInForm();
     return currentExchangeRate;
   }
 
-  // Priority 3: Fetch from API only if no dashboard rate
+  // Priority 3: Fetch from API only if no stored rate
   try {
     const response = await fetch('https://api.exchangerate-api.com/v4/latest/NGN');
     const data = await response.json();
     
     if (data && data.rates) {
-      // ZAR rate
       const zarRate = 1 / data.rates.ZAR;
       const bufferedZar = Math.ceil((zarRate + 20) / 100) * 100;
       currentExchangeRate = bufferedZar;
       localStorage.setItem('exchange_rate_zar', currentExchangeRate.toString());
       
-      // USD rate
       const usdRate = 1 / data.rates.USD;
       const bufferedUsd = Math.ceil((usdRate + 20) / 100) * 100;
       currentUsdRate = bufferedUsd;
       localStorage.setItem('exchange_rate_usd', currentUsdRate.toString());
       
       updateRateDisplay();
+      updateRateDisplayInForm();
       return currentExchangeRate;
     }
   } catch (error) {
@@ -50,6 +97,10 @@ async function fetchExchangeRate() {
   }
   
   // Priority 4: Hardcoded fallback
+  currentExchangeRate = 84;
+  localStorage.setItem('exchange_rate_zar', '84');
+  updateRateDisplay();
+  updateRateDisplayInForm();
   return currentExchangeRate;
 }
 
@@ -59,10 +110,35 @@ function updateRateDisplay() {
     display.textContent = `1 ZAR = ₦${currentExchangeRate} | 1 USD = ₦${currentUsdRate}`;
   }
   
-  // Update the input field to show current ZAR rate
   const input = document.getElementById('exchange-rate');
   if (input) {
     input.value = currentExchangeRate;
+  }
+}
+
+function updateRateDisplayInForm() {
+  const display = document.getElementById('display-rate');
+  if (display) {
+    display.textContent = currentExchangeRate;
+  }
+}
+
+// ===== SYNC RATE TO SUPABASE =====
+async function syncRateToSupabase(rate) {
+  try {
+    const success = await updateExchangeRateInDB(rate);
+    if (success) {
+      // Update local storage after successful sync
+      localStorage.setItem('exchange_rate_zar', rate.toString());
+      currentExchangeRate = rate;
+      updateRateDisplay();
+      updateRateDisplayInForm();
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Sync rate error:', error);
+    return false;
   }
 }
 
@@ -163,7 +239,6 @@ async function loadProducts() {
       `;
     }).join('');
 
-    // Add event listeners for edit buttons
     document.querySelectorAll('.edit-product-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         const productId = this.dataset.id;
@@ -172,7 +247,6 @@ async function loadProducts() {
       });
     });
 
-    // Add event listeners for delete buttons
     document.querySelectorAll('.delete-product-btn').forEach(btn => {
       btn.addEventListener('click', function() {
         const productId = this.dataset.id;
@@ -190,6 +264,7 @@ async function loadProducts() {
     `;
   }
 }
+
 // ===== IMAGE UPLOAD FUNCTIONS =====
 async function uploadImage(file) {
   const fileExt = file.name.split('.').pop();
@@ -206,7 +281,6 @@ async function uploadImage(file) {
     return null;
   }
 
-  // Get public URL
   const { data: { publicUrl } } = _supabase.storage
     .from('product-images')
     .getPublicUrl(filePath);
@@ -266,7 +340,6 @@ function openEditProductModal(product) {
   document.getElementById('product-id').value = product.id;
   document.getElementById('product-name').value = product.name;
   document.getElementById('product-description').value = product.description || '';
-  document.getElementById('product-price-ngn').value = product.price || '';
   document.getElementById('product-price-zar').value = product.price_zar || '';
   document.getElementById('product-category').value = product.category || '';
   document.getElementById('product-stock').value = product.stock || 10;
@@ -290,38 +363,26 @@ async function saveProduct(event) {
 
   const id = document.getElementById('product-id').value;
   const name = document.getElementById('product-name').value.trim();
-  
   const slug = name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-  
   const description = document.getElementById('product-description').value.trim();
   
-  // ===== PRICE HANDLING — PRIORITY SYSTEM =====
-  const priceNgn = parseInt(document.getElementById('product-price-ngn').value);
+  // ===== PRICE HANDLING =====
+  // Get ZAR price (required)
   const priceZarInput = document.getElementById('product-price-zar').value.trim();
-  
-  // Priority 1: Manual ZAR input
-  let finalPriceZar;
-  if (priceZarInput) {
-    finalPriceZar = parseInt(priceZarInput);
-  } else {
-    // Priority 2: Use dashboard rate (from localStorage)
-    const dashboardRate = parseInt(localStorage.getItem('exchange_rate_zar'));
-    
-    if (dashboardRate && dashboardRate > 0) {
-      finalPriceZar = Math.round(priceNgn / dashboardRate);
-    } else {
-      // Priority 3 & 4: Use currentExchangeRate or fallback
-      const rate = currentExchangeRate || 55;
-      finalPriceZar = Math.round(priceNgn / rate);
-    }
-  }
+  const priceZar = parseInt(priceZarInput);
+
+  // Get the dashboard rate (from localStorage or fallback)
+  const rate = parseInt(localStorage.getItem('exchange_rate_zar')) || 84;
+
+  // Auto-calculate NGN price
+  const priceNgn = priceZar * rate;
   
   const category = document.getElementById('product-category').value;
   const stock = parseInt(document.getElementById('product-stock').value) || 0;
   const imageFile = document.getElementById('product-image').files[0];
   const existingImageUrl = document.getElementById('product-image-url').value;
 
-  if (!name || !slug || !priceNgn || !category) {
+  if (!name || !slug || !priceZar || !category) {
     showToast('Please fill in all required fields.', 'warning');
     return;
   }
@@ -358,7 +419,7 @@ async function saveProduct(event) {
           slug,
           description,
           price: priceNgn,
-          price_zar: finalPriceZar,
+          price_zar: priceZar,
           category,
           image_url: imageUrl,
           stock,
@@ -373,7 +434,7 @@ async function saveProduct(event) {
           slug,
           description,
           price: priceNgn,
-          price_zar: finalPriceZar,
+          price_zar: priceZar,
           category,
           image_url: imageUrl,
           stock
@@ -399,12 +460,40 @@ async function saveProduct(event) {
 // ===== DELETE PRODUCT =====
 async function deleteProduct(productId) {
   try {
-    const { error } = await _supabase
+    // First, get the product to find the image URL
+    const { data: product, error: fetchError } = await _supabase
+      .from('products')
+      .select('image_url')
+      .eq('id', productId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Delete the product from database
+    const { error: deleteError } = await _supabase
       .from('products')
       .delete()
       .eq('id', productId);
 
-    if (error) throw error;
+    if (deleteError) throw deleteError;
+
+    // If product had an image, delete it from storage
+    if (product && product.image_url) {
+      const urlParts = product.image_url.split('/');
+      const filePath = urlParts.slice(urlParts.indexOf('product-images') + 1).join('/');
+      
+      if (filePath) {
+        const { error: storageError } = await _supabase.storage
+          .from('product-images')
+          .remove([filePath]);
+
+        if (storageError) {
+          console.error('Storage delete error:', storageError);
+        } else {
+          console.log('Image deleted from storage:', filePath);
+        }
+      }
+    }
 
     clearPublicProductsCache();
     showToast('Product deleted successfully!', 'success');
@@ -435,19 +524,16 @@ function closeDeleteModal() {
 
 // ===== EVENT LISTENERS =====
 document.addEventListener('DOMContentLoaded', function() {
-  // Add product button
   const addBtn = document.getElementById('add-product-btn');
   if (addBtn) {
     addBtn.addEventListener('click', openAddProductModal);
   }
 
-  // Product form submit
   const productForm = document.getElementById('product-form');
   if (productForm) {
     productForm.addEventListener('submit', saveProduct);
   }
 
-  // Close modal buttons
   const modalClose = document.getElementById('modal-close');
   if (modalClose) {
     modalClose.addEventListener('click', closeProductModal);
@@ -465,7 +551,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Delete modal controls
   const deleteCancel = document.getElementById('delete-cancel-btn');
   if (deleteCancel) {
     deleteCancel.addEventListener('click', closeDeleteModal);
@@ -486,7 +571,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // ===== IMAGE UPLOAD EVENT LISTENERS =====
   const imageInput = document.getElementById('product-image');
   if (imageInput) {
     imageInput.addEventListener('change', function() {
@@ -509,23 +593,25 @@ document.addEventListener('DOMContentLoaded', function() {
   // ===== EXCHANGE RATE: Load rate on page load =====
   fetchExchangeRate();
 
-  // ===== EXCHANGE RATE: Update rate handler =====
+  // ===== EXCHANGE RATE: Update rate handler (SYNC TO SUPABASE) =====
   const updateRateBtn = document.getElementById('update-rate-btn');
   if (updateRateBtn) {
-    updateRateBtn.addEventListener('click', function() {
+    updateRateBtn.addEventListener('click', async function() {
       const input = document.getElementById('exchange-rate');
       const newRate = parseInt(input.value);
       if (newRate && newRate > 0) {
-        currentExchangeRate = newRate;
-        localStorage.setItem('exchange_rate_zar', newRate.toString());
-        updateRateDisplay();
-        showToast('Exchange rate updated successfully!', 'success');
+        // Sync to Supabase
+        const synced = await syncRateToSupabase(newRate);
+        if (synced) {
+          showToast('Exchange rate updated and synced across all devices!', 'success');
+        } else {
+          showToast('Failed to sync rate. Please try again.', 'error');
+        }
       } else {
         showToast('Please enter a valid exchange rate.', 'warning');
       }
     });
   }
 
-  // Load products
   loadProducts();
 });

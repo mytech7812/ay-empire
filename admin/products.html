@@ -76,16 +76,13 @@
             </select>
           </div>
         </div>
-        <div class="form-row">
-  <div class="form-group">
-    <label for="product-price-ngn">Price (NGN) *</label>
-    <input type="number" id="product-price-ngn" placeholder="15000" required>
-  </div>
-  <div class="form-group">
-    <label for="product-price-zar">Price (ZAR)</label>
-    <input type="number" id="product-price-zar" placeholder="e.g., 1000">
-    <small style="color: var(--text-mid); font-size: 0.7rem;">Optional — auto-calculated if left blank</small>
-  </div>
+<div class="form-group">
+  <label for="product-price-zar">Price (ZAR) *</label>
+  <input type="number" id="product-price-zar" placeholder="e.g., 1000" required>
+  <small style="color: var(--text-mid); font-size: 0.7rem; display: block; margin-top: 0.2rem;">
+    NGN price will be auto-calculated using the dashboard exchange rate (1 ZAR = <span id="display-rate">84</span> NGN)
+  </small>
+  <input type="hidden" id="product-price-ngn" value="">
 </div>
         <div class="form-row">
 <div class="form-group">
