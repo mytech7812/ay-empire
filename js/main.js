@@ -1,3 +1,23 @@
+function isMobileNavActive() {
+  const hamburger = document.querySelector('.hamburger');
+  return hamburger && window.getComputedStyle(hamburger).display !== 'none';
+}
+
+function closeMobileNav() {
+  const links = document.querySelector('.nav-links');
+  if (links && isMobileNavActive()) {
+    links.style.display = 'none';
+  }
+}
+
+function resetDesktopNav() {
+  const links = document.querySelector('.nav-links');
+  if (links && !isMobileNavActive()) {
+    links.removeAttribute('style');
+  }
+}
+
+window.addEventListener('resize', resetDesktopNav);
 // ===== SMOOTH SCROLL =====
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function(e) {
@@ -5,6 +25,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     if (target && target !== '#' && document.querySelector(target)) {
       e.preventDefault();
       document.querySelector(target).scrollIntoView({ behavior: 'smooth' });
+      closeMobileNav();
     }
   });
 });
@@ -25,7 +46,10 @@ document.querySelector('.hamburger')?.addEventListener('click', function() {
     links.style.borderBottom = '1px solid var(--border)';
   }
 });
-
+// Close the mobile menu after choosing a nav link, including same-page section links.
+document.querySelectorAll('.nav-links a').forEach(link => {
+  link.addEventListener('click', closeMobileNav);
+});
 // ===== MOBILE CART LINK =====
 function updateMobileCartBadge() {
   const nav = document.querySelector('nav');
