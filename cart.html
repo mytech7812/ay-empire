@@ -13,6 +13,7 @@
 
   <!-- Main Styles -->
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -74,7 +75,7 @@
             <span>Total</span>
             <span id="cart-total">₦0</span>
           </div>
-          <a href="checkout.html" class="btn-primary checkout-btn">Proceed to Checkout</a>
+          <a href="checkout.html" class="btn-primary checkout-btn" onclick="return canProceedToCheckout();">Proceed to Checkout</a>
         </div>
       </div>
 

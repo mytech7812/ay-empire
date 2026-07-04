@@ -106,6 +106,8 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { customer, items, shipping, currency, exchangeRate } = body;
 
+    console.log('Items received from frontend:', JSON.stringify(items));
+
     // Validate required fields
     const required = ['fullName', 'email', 'phone', 'address', 'city', 'state', 'country'];
     for (const field of required) {
@@ -196,6 +198,8 @@ const { data: order, error: orderError } = await supabase
     // ===== INITIALIZE PAYSTACK =====
     const siteUrl = (Deno.env.get('SITE_URL') || 'https://ayempire.com').replace(/\/$/, '');
     console.log('Payment callback URL:', siteUrl);
+
+    console.log('Amount being sent to Paystack (in kobo):', totalNgn * 100);
 
     const paystackResponse = await fetch('https://api.paystack.co/transaction/initialize', {
       method: 'POST',
