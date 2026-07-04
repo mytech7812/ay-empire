@@ -33,17 +33,26 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 // ===== HAMBURGER MENU =====
 document.querySelector('.hamburger')?.addEventListener('click', function() {
   const links = document.querySelector('.nav-links');
+  const label = this.querySelector('.hamburger-label');
+  
+  // Toggle hamburger open state
+  this.classList.toggle('open');
+  
   if (links.style.display === 'flex') {
     links.style.display = 'none';
+    if (label) label.textContent = 'Menu';
   } else {
     links.style.display = 'flex';
     links.style.position = 'absolute';
     links.style.top = '72px';
     links.style.left = '0';
     links.style.right = '0';
-    links.style.background = 'var(--cream-light)';
+    links.style.background = '#4A2E1A';
     links.style.padding = '1.5rem 5%';
     links.style.borderBottom = '1px solid var(--border)';
+    links.style.flexDirection = 'column';
+    links.style.gap = '0.5rem';
+    if (label) label.textContent = 'Close';
   }
 });
 // Close the mobile menu after choosing a nav link, including same-page section links.
@@ -65,14 +74,14 @@ function updateMobileCartBadge() {
     mobileCartLink.href = 'cart.html';
     mobileCartLink.className = 'mobile-cart-link';
     mobileCartLink.setAttribute('aria-label', 'View cart');
-    mobileCartLink.innerHTML = `
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="21" r="1"/>
-        <circle cx="20" cy="21" r="1"/>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-      </svg>
-      <span class="mobile-cart-count">0</span>
-    `;
+mobileCartLink.innerHTML = `
+  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#FAF5EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="9" cy="21" r="1"/>
+    <circle cx="20" cy="21" r="1"/>
+    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+  </svg>
+  <span class="mobile-cart-count">0</span>
+`;
     nav.insertBefore(mobileCartLink, hamburger);
   }
 

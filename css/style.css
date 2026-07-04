@@ -26,7 +26,7 @@
   /* ======== NAVBAR ======== */
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 999;
-    background: rgba(245, 211, 164, 0.96);
+    background:  #4A2E1A;
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     padding: 0 5%;
@@ -41,11 +41,11 @@
   }
   .nav-logo span { color: var(--gold); }
   .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-  .nav-links a {
-    font-size: 0.82rem; font-weight: 500; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--text-mid); text-decoration: none;
-    transition: color 0.25s;
-  }
+.nav-links a {
+  font-size: 0.82rem; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--cream-light); text-decoration: none;
+  transition: color 0.25s;
+}
   .nav-links a:hover { color: var(--gold); }
   .nav-cta {
     background: var(--gold); color: var(--white) !important;
@@ -74,14 +74,14 @@
     padding: 0 5px;
     border-radius: 999px;
     background: var(--gold);
-    color: var(--white);
+    color: var(--cream-light);
     font-size: 0.65rem;
     font-weight: 700;
     line-height: 18px;
     text-align: center;
   }
   .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
-  .hamburger span { width: 24px; height: 2px; background: var(--gold); display: block; }
+.hamburger span { width: 24px; height: 2px; background: var(--cream-light); display: block; }
 
   /* ======== HERO ======== */
   .hero {
@@ -3041,5 +3041,63 @@
   .delivery-note {
     font-size: 0.78rem;
     padding: 0.5rem 0.8rem;
+  }
+}
+
+/* ===== HAMBURGER MENU ===== */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0.3rem 0.5rem;
+  position: relative;
+  z-index: 1001;
+}
+
+.hamburger span {
+  width: 24px;
+  height: 2px;
+  background: var(--cream-light);
+  display: block;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.hamburger-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cream-light);
+  margin-top: 2px;
+  transition: color 0.3s ease;
+}
+
+/* Hamburger open state (X) */
+.hamburger.open .hamburger-line:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.hamburger.open .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburger.open .hamburger-line:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.hamburger.open .hamburger-label {
+  color: var(--gold-light);
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .hamburger {
+    display: flex;
   }
 }
