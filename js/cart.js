@@ -176,5 +176,11 @@ function updateCartBadge() {
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', function() {
-  loadCart();
+  if (typeof currencyReady !== 'undefined' && currencyReady) {
+    loadCart();
+  } else {
+    document.addEventListener('currencyReady', function() {
+      loadCart();
+    });
+  }
 });

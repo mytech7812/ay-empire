@@ -124,18 +124,20 @@
     
 const orderData = JSON.parse(sessionStorage.getItem('orderData'));
 if (orderData) {
-  const currency = orderData.currency || 'NGN';
-  const exchangeRate = orderData.exchangeRate || 1;
+  const currency = orderData.currency || 'ZAR'; // ← Change default to ZAR
+  const exchangeRate = orderData.exchangeRate || 84;
   
   let displayTotal = orderData.total;
-  let symbol = '₦';
+  let symbol = 'R';
   
-  if (currency === 'ZAR') {
-    displayTotal = Math.round(orderData.total / exchangeRate);
-    symbol = 'R';
+  if (currency === 'NGN') {
+    symbol = '₦';
   } else if (currency === 'USD') {
     displayTotal = Math.round(orderData.total / exchangeRate);
     symbol = '$';
+  } else if (currency === 'ZAR') {
+    displayTotal = Math.round(orderData.total / exchangeRate);
+    symbol = 'R';
   }
   
   document.getElementById('order-total').textContent = symbol + ' ' + displayTotal.toLocaleString();

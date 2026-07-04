@@ -207,6 +207,7 @@ function updatePrices(currency) {
     display.textContent = symbols[currency] || '₦ NGN';
   }
   
+  // Update all price elements
   document.querySelectorAll('[data-price-ngn]').forEach(el => {
     const priceNgn = parseInt(el.dataset.priceNgn);
     el.textContent = formatPrice(priceNgn, currency);
@@ -227,16 +228,29 @@ function updatePrices(currency) {
     }
   }
   
+  // 👇 Add these two lines
+  // Refresh cart if on cart page
+  if (document.getElementById('cart-items') && typeof loadCart === 'function') {
+    loadCart();
+  }
+  
+  // Refresh checkout if on checkout page
+  if (document.getElementById('checkout-items') && typeof loadCheckout === 'function') {
+    loadCheckout();
+  }
+  
   localStorage.setItem('user_currency', currency);
 }
 
-// ===== INITIALIZE CURRENCY SYSTEM =====
+// ===== CURRENCY READY FLAG =====
+let currencyReady = false;
+
 async function initCurrency() {
   // Fetch rates from Supabase
   await fetchRatesFromSupabase();
   
-  // Use stored preference or default to NGN
-  const preferredCurrency = localStorage.getItem('user_currency') || 'NGN';
+  // Use stored preference or default to ZAR
+  const preferredCurrency = localStorage.getItem('user_currency') || 'ZAR';
   currentCurrency = preferredCurrency;
   
   const display = document.getElementById('currency-display');
@@ -245,6 +259,10 @@ async function initCurrency() {
   }
   
   updatePrices(currentCurrency);
+  
+  // Signal that currency is ready
+  currencyReady = true;
+  document.dispatchEvent(new CustomEvent('currencyReady'));
 }
 
 // ===== CURRENCY DROPDOWN EVENTS =====

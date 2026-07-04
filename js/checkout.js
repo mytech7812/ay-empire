@@ -11,7 +11,7 @@ const placeOrderBtn = document.getElementById('place-order-btn');
 function getExchangeRate(currency) {
   if (currency === 'ZAR') {
     const stored = localStorage.getItem('exchange_rate_zar');
-    return stored ? parseInt(stored) : 55;
+    return stored ? parseInt(stored) : 84;
   } else if (currency === 'USD') {
     const stored = localStorage.getItem('exchange_rate_usd');
     return stored ? parseInt(stored) : 1400;
@@ -188,43 +188,43 @@ placeOrderBtn.addEventListener('click', async function() {
 
   // Validate required fields
   if (!fullName) {
-    showToast('Please enter your full name.', 'warning');
+    showToast('Please enter your full name.');
     document.getElementById('full-name').focus();
     return;
   }
 
   if (!email) {
-    showToast('Please enter your email address.', 'warning');
+    showToast('Please enter your email address.');
     document.getElementById('email').focus();
     return;
   }
 
   if (!phone) {
-    showToast('Please enter your phone number.', 'warning');
+    showToast('Please enter your phone number.');
     document.getElementById('phone').focus();
     return;
   }
 
   if (!address) {
-    showToast('Please enter your delivery address.', 'warning');
+    showToast('Please enter your delivery address.');
     document.getElementById('address').focus();
     return;
   }
 
   if (!city) {
-    showToast('Please enter your city.', 'warning');
+    showToast('Please enter your city.');
     document.getElementById('city').focus();
     return;
   }
 
   if (!state) {
-    showToast('Please enter your state.', 'warning');
+    showToast('Please enter your state.');
     document.getElementById('state').focus();
     return;
   }
 
   if (!country) {
-    showToast('Please select your country.', 'warning');
+    showToast('Please select your country.');
     document.getElementById('country').focus();
     return;
   }
@@ -233,7 +233,7 @@ placeOrderBtn.addEventListener('click', async function() {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
   if (cart.length === 0) {
-    showToast('Your cart is empty.', 'warning');
+    showToast('Your cart is empty.');
     return;
   }
 
@@ -340,6 +340,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize delivery info
   updateDeliveryInfo();
 
-  // Load checkout
-  loadCheckout();
+  // Wait for currency to be ready before loading checkout
+  if (typeof currencyReady !== 'undefined' && currencyReady) {
+    loadCheckout();
+  } else {
+    document.addEventListener('currencyReady', function() {
+      loadCheckout();
+    });
+  }
 });
