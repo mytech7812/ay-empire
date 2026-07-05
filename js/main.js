@@ -160,7 +160,7 @@ document.addEventListener('click', function(e) {
 });
 
 // ===== CURRENCY SYSTEM (SIMPLIFIED) =====
-let currentCurrency = 'NGN';
+let currentCurrency = 'ZAR';
 
 // ===== FETCH RATES FROM SUPABASE =====
 async function fetchRatesFromSupabase() {
@@ -212,8 +212,8 @@ function updatePrices(currency) {
   
   const display = document.getElementById('currency-display');
   if (display) {
-    const symbols = { NGN: '₦ NGN', ZAR: 'R ZAR', USD: '$ USD' };
-    display.textContent = symbols[currency] || '₦ NGN';
+    const symbols = { ZAR: 'R ZAR', USD: '$ USD' }; // Removed NGN
+    display.textContent = symbols[currency] || 'R ZAR';
   }
   
   // Update all price elements

@@ -3113,3 +3113,86 @@
   font-weight: 500;
   margin: 0.3rem 0;
 }
+
+/* ===== ABOUT SOCIAL ===== */
+.about-social {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.about-social-icons {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 1.5rem;
+}
+
+.about-social-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+  transition: transform 0.25s;
+}
+
+.about-social-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.social-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-mid);
+  letter-spacing: 0.04em;
+}
+
+.about-social-icon:hover {
+  transform: translateY(-4px);
+}
+
+/* Brand Colors */
+.about-social-icon.instagram {
+  color: #E4405F;
+}
+.about-social-icon.instagram .social-label {
+  color: #E4405F;
+}
+
+.about-social-icon.tiktok {
+  color: #000000;
+}
+.about-social-icon.tiktok .social-label {
+  color: #000000;
+}
+
+.about-social-icon.whatsapp {
+  color: #25D366;
+}
+.about-social-icon.whatsapp .social-label {
+  color: #25D366;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .about-social-icons {
+    gap: 1.5rem;
+  }
+  
+  .about-social-icon svg {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .social-label {
+    font-size: 0.65rem;
+  }
+}
+@media (max-width: 768px) {
+  .nav-logo img {
+    height: 100px !important;
+  }
+}
