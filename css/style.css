@@ -81,7 +81,8 @@
     text-align: center;
   }
   .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
-.hamburger span { width: 24px; height: 2px; background: var(--cream-light); display: block; }
+  /* target only the line elements so the label isn't styled as a bar */
+  .hamburger .hamburger-line { width: 24px; height: 2px; background: var(--cream-light); display: block; }
 
   /* ======== HERO ======== */
   .hero {
@@ -3137,6 +3138,14 @@
   justify-content: center;
   flex-wrap: wrap;
   margin-top: 1.5rem;
+}
+
+/* make the socials block visually match other sections */
+.about-social-icons {
+  border: 1px solid var(--border);
+  padding: 1rem;
+  border-radius: 6px;
+  background: rgba(201,168,76,0.02);
 }
 
 .about-social-icon {
