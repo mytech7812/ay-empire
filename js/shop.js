@@ -146,7 +146,7 @@ function renderProducts() {
       <div class="treatment-card">
         <a href="product.html?id=${product.id}" class="shop-card-image-link">
           <div class="treatment-img">
-            <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
+            <img src="${product.image}" alt="${product.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
         </a>
         <div class="treatment-info">

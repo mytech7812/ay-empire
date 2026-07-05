@@ -19,7 +19,9 @@
 
 <!-- NAVBAR -->
 <nav>
-  <a href="index.html" class="nav-logo">AY <span>Empire</span></a>
+  <a href="index.html" class="nav-logo">
+  <img src="images/logo.png" alt="AY Empire" style="height: 130px; width: auto; vertical-align: middle; margin-top: 4px; margin-left: -10px;">
+</a>
   <ul class="nav-links">
     <li><a href="index.html">Home</a></li>
     <li><a href="shop.html">Shop</a></li>
@@ -46,6 +48,12 @@
 
     <!-- Cart Items -->
     <div class="cart-content" id="cart-content">
+
+       <!-- Cart Loading State -->
+  <div class="cart-loading" id="cart-loading" style="display: none;">
+    <div class="cart-loading-spinner"></div>
+    <p>Loading your cart...</p>
+  </div>
       
       <!-- Empty Cart (hidden by default) -->
       <div class="cart-empty" id="cart-empty">

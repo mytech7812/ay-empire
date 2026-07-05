@@ -80,11 +80,32 @@ async function verifyCartItems() {
 
 // ===== LOAD CART =====
 async function loadCart() {
+  // Show loading state
+  const loadingEl = document.getElementById('cart-loading');
+  if (loadingEl) {
+    loadingEl.style.display = 'block';
+  }
+  
+  // Hide empty and items wrappers while loading
+  if (cartEmpty) {
+    cartEmpty.style.display = 'none';
+  }
+  if (cartItemsWrapper) {
+    cartItemsWrapper.style.display = 'none';
+  }
+
   const verifiedItems = await verifyCartItems();
+  
+  // Hide loading
+  if (loadingEl) {
+    loadingEl.style.display = 'none';
+  }
   
   // Update localStorage with verified items (remove unavailable ones)
   const availableItems = verifiedItems.filter(item => item.available);
   localStorage.setItem('cart', JSON.stringify(availableItems));
+  
+  updateCartBadge();
 
   if (verifiedItems.length === 0 || availableItems.length === 0) {
     cartItemsWrapper.style.display = 'none';
