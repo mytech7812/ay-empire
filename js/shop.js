@@ -11,11 +11,14 @@ const shopGrid = document.getElementById('shop-grid');
 const emptyState = document.getElementById('empty-state');
 const filterBtns = document.querySelectorAll('.filter-btn');
 const sortSelect = document.getElementById('sort-select');
+const searchInput = document.getElementById('shop-search-input');
+const searchBtn = document.getElementById('shop-search-btn');
 
 // ===== STATE =====
 let products = [];
 let currentFilter = 'all';
 let currentSort = 'default';
+let currentSearch = '';
 let filteredProducts = [];
 
 const PRODUCTS_CACHE_KEY = 'ay_empire_products_cache_v1';
@@ -107,11 +110,19 @@ async function loadProductsFromSupabase() {
 
 // ===== RENDER PRODUCTS =====
 function renderProducts() {
-  if (currentFilter === 'all') {
-    filteredProducts = [...products];
-  } else {
-    filteredProducts = products.filter(p => p.category === currentFilter);
+  let result = currentFilter === 'all'
+    ? [...products]
+    : products.filter(p => p.category === currentFilter);
+
+  if (currentSearch) {
+    const query = currentSearch.toLowerCase();
+    result = result.filter(product => {
+      const haystack = `${product.name} ${product.category} ${product.description || ''} ${product.sub || ''}`.toLowerCase();
+      return haystack.includes(query);
+    });
   }
+
+  filteredProducts = result;
 
   switch (currentSort) {
     case 'price-low':
@@ -134,6 +145,9 @@ function renderProducts() {
 
   if (filteredProducts.length === 0) {
     emptyState.style.display = 'block';
+    emptyState.innerHTML = currentSearch
+      ? `<p>No products match "${currentSearch}". Try a different keyword.</p>`
+      : '<p>No products found in this category.</p>';
     return;
   }
   emptyState.style.display = 'none';
@@ -210,13 +224,18 @@ function attachShopCardHandlers() {
       }
 
       const cart = JSON.parse(localStorage.getItem('cart')) || [];
-      const existingItem = cart.find(item => item.id === product.id);
+      const existingItem = cart.find(item => {
+        return item.id === (product.supabase_id || product.id) || item.slug === product.id;
+      });
 
       if (existingItem) {
         existingItem.quantity += quantity;
+        existingItem.id = product.supabase_id || existingItem.id;
+        existingItem.slug = product.id;
       } else {
         cart.push({
-          id: product.id,
+          id: product.supabase_id || product.id,
+          slug: product.id,
           name: product.name,
           price: product.price,
           quantity: quantity,
@@ -247,6 +266,34 @@ if (sortSelect) {
   sortSelect.addEventListener('change', function() {
     currentSort = this.value;
     renderProducts();
+  });
+}
+
+// ===== SEARCH HANDLERS =====
+function applySearch() {
+  if (searchInput) {
+    currentSearch = searchInput.value.trim().toLowerCase();
+  }
+  renderProducts();
+}
+
+if (searchBtn) {
+  searchBtn.addEventListener('click', applySearch);
+}
+
+if (searchInput) {
+  searchInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      applySearch();
+    }
+  });
+
+  searchInput.addEventListener('input', function() {
+    if (!this.value.trim()) {
+      currentSearch = '';
+      renderProducts();
+    }
   });
 }
 

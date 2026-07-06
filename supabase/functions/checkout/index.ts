@@ -104,7 +104,7 @@ Deno.serve(async (req) => {
 
     // Parse request body
     const body = await req.json();
-    const { customer, items, shipping, currency, exchangeRate } = body;
+    const { customer, items, currency } = body;
 
     console.log('Items received from frontend:', JSON.stringify(items));
 
@@ -119,76 +119,140 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Look up product prices from database
+    // ===== LOOK UP PRODUCTS BY BOTH ID AND SLUG =====
     const productIds = items.map((item: any) => item.id);
+    const slugs = items.map((item: any) => item.slug || item.id);
+
+    // Query by both UUID and slug
     const { data: products, error } = await supabase
       .from('products')
       .select('id, slug, name, price')
-      .in('slug', productIds);
+      .or(`id.in.(${productIds.join(',')}),slug.in.(${slugs.map((s: string) => `'${s}'`).join(',')})`);
 
     if (error) {
       console.error('Product lookup error:', error);
       throw new Error('Failed to fetch products');
     }
 
-    // Build price map
+    // Build price map keyed by both UUID and slug
     const priceMap: Record<string, number> = {};
+    const productMap: Record<string, any> = {};
     products?.forEach((p: any) => {
-      priceMap[p.slug] = p.price;
+      priceMap[p.id] = p.price;
+      if (p.slug) {
+        priceMap[p.slug] = p.price;
+      }
+      productMap[p.id] = p;
+      if (p.slug) {
+        productMap[p.slug] = p;
+      }
     });
 
-// Calculate total with real prices
-let subtotal = 0;
-const orderItems = items.map((item: any) => {
-  const product = products?.find((p: any) => p.slug === item.id);
-  const realPrice = product?.price || 0;
-  const quantity = parseInt(item.quantity) || 1;
-  subtotal += realPrice * quantity;
-  
-  return {
-    id: item.id,
-    name: product?.name || 'Unknown Product',  // ← Add product name
-    quantity: quantity,
-    price: realPrice,
-    total: realPrice * quantity,
-  };
-});
+    // ===== CALCULATE TOTAL WITH VALIDATION =====
+    let subtotal = 0;
+    const orderItems = [];
+    const invalidItems = [];
+
+    for (const item of items) {
+      const product = productMap[item.id] || productMap[item.slug];
+      
+      if (!product) {
+        invalidItems.push(item.id || item.slug);
+        continue;
+      }
+      
+      const realPrice = product.price || 0;
+      const quantity = parseInt(item.quantity) || 1;
+      subtotal += realPrice * quantity;
+      
+      orderItems.push({
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        quantity: quantity,
+        price: realPrice,
+        total: realPrice * quantity,
+      });
+    }
+
+    // ✅ Reject invalid items
+    if (invalidItems.length > 0) {
+      console.error('Invalid products in cart:', invalidItems);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Some products in your cart are no longer available',
+          invalid_items: invalidItems 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (orderItems.length === 0) {
+      return new Response(
+        JSON.stringify({ error: 'Your cart is empty or contains invalid items.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // ===== SERVER-SIDE EXCHANGE RATE =====
+    const { data: rateData, error: rateError } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'exchange_rate_zar')
+      .single();
+
+    const serverRate = rateData ? parseInt(rateData.value) : 84;
+
+    // ===== SERVER-SIDE SHIPPING CALCULATION =====
+    let shippingNgn = 0;
+    const country = customer.country || '';
+
+    if (body.deliveryMethod === 'shipping') {
+      if (country === 'South Africa') {
+        shippingNgn = 100 * serverRate;
+      } else if (country === 'Nigeria') {
+        shippingNgn = 0;
+      } else if (['USA', 'Canada', 'Mexico'].includes(country)) {
+        shippingNgn = 2500 * serverRate;
+      } else if (['UK', 'United Arab Emirates'].includes(country)) {
+        shippingNgn = 2200 * serverRate;
+      } else if (country && country !== '') {
+        shippingNgn = 1200 * serverRate;
+      }
+    }
 
     // ===== CREATE ORDER =====
-    const shippingNgn = shipping || 0;
     const totalNgn = subtotal + shippingNgn;
-    const rate = exchangeRate || 1400;
-    const totalZar = Math.round(totalNgn / rate);
-
+    const totalZar = Math.round(totalNgn / serverRate);
     const orderNumber = generateOrderNumber();
+    const currencyUsed = currency || 'NGN';
 
-    // ===== CREATE ORDER =====
-const { data: order, error: orderError } = await supabase
-  .from('orders')
-  .insert({
-    order_number: orderNumber,
-    customer_name: customer.fullName,
-    customer_email: customer.email,
-    customer_phone: customer.phone,
-    customer_address: customer.address,
-    customer_city: customer.city,
-    customer_state: customer.state,
-    customer_country: customer.country,
-    customer_zip: customer.zip || '', 
-    notes: customer.notes || '',
-    items: orderItems,
-    subtotal: subtotal,
-    shipping: shippingNgn,
-    total: totalNgn,
-    total_zar: totalZar,
-    exchange_rate_used: rate,
-    currency_used: currency || 'NGN',
-    delivery_method: body.deliveryMethod || 'pickup',
-    delivery_partner: body.deliveryPartner || 'Pickup',
-    status: 'pending',
-  })
-  .select()
-  .single();
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        order_number: orderNumber,
+        customer_name: customer.fullName,
+        customer_email: customer.email,
+        customer_phone: customer.phone,
+        customer_address: customer.address,
+        customer_city: customer.city,
+        customer_state: customer.state,
+        customer_country: customer.country,
+        customer_zip: customer.zip || '', 
+        notes: customer.notes || '',
+        items: orderItems,
+        subtotal: subtotal,
+        shipping: shippingNgn,
+        total: totalNgn,
+        total_zar: totalZar,
+        exchange_rate_used: serverRate,
+        currency_used: currencyUsed,
+        delivery_method: body.deliveryMethod || 'pickup',
+        delivery_partner: body.deliveryPartner || 'Pickup',
+        status: 'pending',
+      })
+      .select()
+      .single();
 
     if (orderError) {
       console.error('Order creation error:', orderError);
@@ -198,7 +262,6 @@ const { data: order, error: orderError } = await supabase
     // ===== INITIALIZE PAYSTACK =====
     const siteUrl = (Deno.env.get('SITE_URL') || 'https://ayempire.com').replace(/\/$/, '');
     console.log('Payment callback URL:', siteUrl);
-
     console.log('Amount being sent to Paystack (in kobo):', totalNgn * 100);
 
     const paystackResponse = await fetch('https://api.paystack.co/transaction/initialize', {

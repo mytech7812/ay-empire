@@ -13,54 +13,65 @@ async function verifyCartItems() {
   if (cart.length === 0) return [];
 
   try {
-    // Check if _supabase is already defined (from shop.js)
     let supabase = window._supabase;
     
-    // If not, create a new instance
     if (!supabase) {
       const supabaseUrl = 'https://iirctokpamybsmgzstnj.supabase.co';
       const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpcmN0b2twYW15YnNtZ3pzdG5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MjYwMTksImV4cCI6MjA5ODAwMjAxOX0.eTW0Ipnibowlp3JVewxFnRXcwReKDqiJs8L_X8UfQVc';
       
-      // Check if supabase-js is loaded
       if (typeof window.supabase === 'undefined') {
-        console.error('Supabase library not loaded. Please refresh the page.');
+        console.error('Supabase library not loaded.');
         return cart;
       }
       
       supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
-      // Store it globally for reuse
       window._supabase = supabase;
     }
 
+    // Fetch products by UUID (id column)
     const { data: products, error } = await supabase
       .from('products')
-      .select('slug, name, price, image_url');
+      .select('id, slug, name, price, image_url');
 
     if (error) {
       console.error('Error fetching products:', error);
       return cart;
     }
 
-    // Create a map of valid slugs with their details
+    // Create a map by UUID (id), with slug fallback for older carts
     const productMap = {};
     products.forEach(p => {
-      productMap[p.slug] = {
+      productMap[p.id] = {
+        id: p.id,
         name: p.name,
         price: p.price,
-        image: p.image_url || '/images/placeholder.jpg'
+        image: p.image_url || '/images/placeholder.jpg',
+        slug: p.slug
       };
+
+      if (p.slug) {
+        productMap[p.slug] = {
+          id: p.id,
+          name: p.name,
+          price: p.price,
+          image: p.image_url || '/images/placeholder.jpg',
+          slug: p.slug
+        };
+      }
     });
 
-    // Check each cart item
+    // Check each cart item by its UUID (id), falling back to legacy slugs
     const verifiedItems = cart.map(item => {
-      const product = productMap[item.id];
+      const product = productMap[item.id] || (item.slug ? productMap[item.slug] : null);
       if (product) {
         return {
           ...item,
+          id: product.id,
           available: true,
           name: product.name,
           price: product.price,
-          image: product.image || item.image
+          image: product.image,
+          slug: product.slug
         };
       } else {
         return {

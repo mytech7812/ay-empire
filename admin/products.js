@@ -593,25 +593,46 @@ document.addEventListener('DOMContentLoaded', function() {
   // ===== EXCHANGE RATE: Load rate on page load =====
   fetchExchangeRate();
 
-  // ===== EXCHANGE RATE: Update rate handler (SYNC TO SUPABASE) =====
-  const updateRateBtn = document.getElementById('update-rate-btn');
-  if (updateRateBtn) {
-    updateRateBtn.addEventListener('click', async function() {
-      const input = document.getElementById('exchange-rate');
-      const newRate = parseInt(input.value);
-      if (newRate && newRate > 0) {
-        // Sync to Supabase
-        const synced = await syncRateToSupabase(newRate);
-        if (synced) {
-          showToast('Exchange rate updated and synced across all devices!', 'success');
-        } else {
-          showToast('Failed to sync rate. Please try again.', 'error');
-        }
-      } else {
-        showToast('Please enter a valid exchange rate.', 'warning');
-      }
-    });
-  }
+// ===== EXCHANGE RATE: Update rate handler (SYNC TO SUPABASE) =====
+const updateRateBtn = document.getElementById('update-rate-btn');
+if (updateRateBtn) {
+  updateRateBtn.addEventListener('click', async function() {
+    const input = document.getElementById('exchange-rate');
+    const newRate = parseInt(input.value);
+    if (newRate && newRate > 0) {
+      try {
+        // ✅ Direct fetch with admin API key header
+        const response = await fetch('https://iirctokpamybsmgzstnj.supabase.co/functions/v1/rates', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-key': 'ayempire_admin_2026_secure_key_12345'
+          },
+          body: JSON.stringify({ zar_rate: newRate }),
+        });
 
-  loadProducts();
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to sync rate');
+        }
+
+        // Update local storage after successful sync
+        localStorage.setItem('exchange_rate_zar', newRate.toString());
+        currentExchangeRate = newRate;
+        updateRateDisplay();
+        updateRateDisplayInForm();
+        
+        showToast('Exchange rate updated and synced across all devices!', 'success');
+      } catch (error) {
+        console.error('Rate sync error:', error);
+        showToast('Failed to sync rate. Please try again.', 'error');
+      }
+    } else {
+      showToast('Please enter a valid exchange rate.', 'warning');
+    }
+  });
+}
+
+loadProducts();
 });

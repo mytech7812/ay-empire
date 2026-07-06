@@ -8,7 +8,7 @@ const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// ===== VERIFY PAYSTACK SIGNATURE =====
+// ===== VERIFY PAYSTACK SIGNATURE (CONSTANT-TIME) =====
 async function verifySignature(body: string, signature: string): Promise<boolean> {
   const encoder = new TextEncoder();
   const key = encoder.encode(paystackSecret);
@@ -29,7 +29,14 @@ async function verifySignature(body: string, signature: string): Promise<boolean
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   
-  return hashHex === signature;
+  // ✅ Constant-time comparison
+  if (hashHex.length !== signature.length) return false;
+  
+  let result = 0;
+  for (let i = 0; i < hashHex.length; i++) {
+    result |= hashHex.charCodeAt(i) ^ signature.charCodeAt(i);
+  }
+  return result === 0;
 }
 
 // ===== VERIFY TRANSACTION WITH PAYSTACK =====
@@ -48,11 +55,9 @@ async function sendConfirmationEmail(order: any) {
     return;
   }
 
-  // Get the currency the customer used
   const currency = order.currency_used || 'NGN';
   const exchangeRate = order.exchange_rate_used || 1400;
 
-  // Format price based on currency with proper conversion
   function formatPrice(amountNgn: number, cur: string) {
     let displayAmount = amountNgn;
     
@@ -66,7 +71,6 @@ async function sendConfirmationEmail(order: any) {
     return `${symbol} ${displayAmount.toLocaleString()}`;
   }
 
-  // Build items HTML with converted prices
   const itemsHtml = order.items.map((item: any) => {
     const itemTotal = item.price * item.quantity;
     return `
@@ -78,7 +82,6 @@ async function sendConfirmationEmail(order: any) {
     `;
   }).join('');
 
-  // Calculate display totals (converted to customer's currency)
   const displaySubtotal = formatPrice(order.subtotal, currency);
   const displayShipping = formatPrice(order.shipping || 0, currency);
   const displayTotal = formatPrice(order.total, currency);
@@ -321,16 +324,11 @@ Deno.serve(async (req) => {
 
       if (order) {
         console.log(`Order ${reference} updated to paid`);
-        // ===== SEND EMAIL =====
         await sendConfirmationEmail(order);
         console.log(`Email sent for order ${reference}`);
-
-         // Send admin notification
         await sendAdminNotification(order);
         console.log(`Admin notification sent for order ${reference}`);
       }
-      
-      
 
       return new Response('Webhook processed successfully', { status: 200 });
     }

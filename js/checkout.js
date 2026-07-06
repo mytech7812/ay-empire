@@ -271,7 +271,7 @@ placeOrderBtn.addEventListener('click', async function() {
           notes,
         },
         items: cart.map(item => ({
-          id: item.id,
+          id: item.id, // UUID from database
           quantity: item.quantity,
         })),
         shipping: shippingNgn,

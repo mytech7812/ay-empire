@@ -39,6 +39,7 @@ function mapProduct(p) {
     price: p.price,
     description: p.description || '',
     image: p.image_url || p.image || '/images/placeholder.jpg',
+    supabase_id: p.id || p.supabase_id,
     stock: p.stock !== undefined && p.stock !== null ? p.stock : 'In Stock'
   };
 }
@@ -183,13 +184,18 @@ if (addToCartBtn) {
     const quantity = parseInt(qtyInput.value);
 
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const existingItem = cart.find(item => item.id === product.id);
+    const existingItem = cart.find(item => {
+      return item.id === (product.supabase_id || product.id) || item.slug === product.id;
+    });
 
     if (existingItem) {
       existingItem.quantity += quantity;
+      existingItem.id = product.supabase_id || existingItem.id;
+      existingItem.slug = product.id;
     } else {
       cart.push({
-        id: product.id,
+        id: product.supabase_id || product.id,
+        slug: product.id,
         name: product.name,
         price: product.price,
         quantity: quantity,
