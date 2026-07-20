@@ -4,6 +4,12 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 const _supabase = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
 
+// ===== ADMIN API KEY =====
+const ADMIN_API_KEY = 'ayempire_admin_2026_secure_key_12345';
+
+// ✅ Make it available to other admin scripts
+window.ADMIN_API_KEY = ADMIN_API_KEY;
+
 // ===== CHECK AUTH ON EVERY ADMIN PAGE =====
 async function checkAuth() {
   const { data: { session } } = await _supabase.auth.getSession();

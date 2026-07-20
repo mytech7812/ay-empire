@@ -56,7 +56,12 @@ function mapProduct(p) {
     image: p.image_url || p.image || '/images/placeholder.jpg',
     sub: p.description ? p.description.substring(0, 60) + (p.description.length > 60 ? '...' : '') : '',
     supabase_id: p.id || p.supabase_id,
-    stock: p.stock !== undefined && p.stock !== null ? p.stock : 'In Stock'
+    stock: p.stock !== undefined && p.stock !== null ? p.stock : 'In Stock',
+    on_sale: p.on_sale || false,
+    sale_price: p.sale_price || null,
+    sale_start: p.sale_start || null,
+    sale_end: p.sale_end || null,
+    price_zar: p.price_zar || null
   };
 }
 
@@ -156,11 +161,40 @@ function renderProducts() {
     const card = document.createElement('div');
     card.className = 'shop-card';
     
+    // ✅ Use centralized isSaleActive function
+    const isOnSale = isSaleActive(product);
+    const salePrice = isOnSale ? product.sale_price : null;
+    let discountPercent = 0;
+
+    if (isOnSale && salePrice) {
+      const originalPrice = product.price_zar || Math.round(product.price / getExchangeRate('ZAR'));
+      discountPercent = Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+    }
+
+    // Check stock status
+    const isOutOfStock = product.stock !== undefined && product.stock !== null && product.stock <= 0;
+    const stockAvailable = product.stock !== undefined && product.stock !== null ? product.stock : 999;
+
+    // Get display price
+    let displayPrice;
+    let originalDisplayPrice = null;
+    if (isOnSale && salePrice) {
+      // Show sale price in current currency
+      const salePriceNgn = salePrice * getExchangeRate('ZAR');
+      displayPrice = formatPrice(salePriceNgn, currentCurrency);
+      // Original price for strikethrough
+      originalDisplayPrice = formatPrice(product.price, currentCurrency);
+    } else {
+      displayPrice = formatPrice(product.price, currentCurrency);
+    }
+
     card.innerHTML = `
-      <div class="treatment-card">
+      <div class="treatment-card ${isOutOfStock ? 'out-of-stock' : ''}">
         <a href="product.html?id=${product.id}" class="shop-card-image-link">
           <div class="treatment-img">
             <img src="${product.image}" alt="${product.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+            ${isOutOfStock ? `<div class="sold-out-badge">Sold Out</div>` : ''}
+            ${isOnSale && !isOutOfStock ? `<div class="sale-ribbon">${discountPercent}% OFF</div>` : ''}
           </div>
         </a>
         <div class="treatment-info">
@@ -170,13 +204,23 @@ function renderProducts() {
           <div class="treatment-sub">${product.sub}</div>
           <div class="shop-card-actions">
             <div class="shop-quantity-selector" aria-label="Quantity for ${product.name}">
-              <button type="button" class="shop-qty-btn shop-qty-decrease" aria-label="Decrease quantity">−</button>
-              <input type="number" class="shop-qty-input" value="1" min="1" max="99" aria-label="Quantity">
-              <button type="button" class="shop-qty-btn shop-qty-increase" aria-label="Increase quantity">+</button>
+              <button type="button" class="shop-qty-btn shop-qty-decrease" aria-label="Decrease quantity" ${isOutOfStock ? 'disabled' : ''}>−</button>
+              <input type="number" class="shop-qty-input" value="1" min="1" max="${isOutOfStock ? 0 : stockAvailable}" aria-label="Quantity" ${isOutOfStock ? 'disabled' : ''}>
+              <button type="button" class="shop-qty-btn shop-qty-increase" aria-label="Increase quantity" ${isOutOfStock ? 'disabled' : ''}>+</button>
             </div>
-            <button type="button" class="btn-primary shop-add-to-cart" data-product-id="${product.id}">Add to Cart</button>
+            <button type="button" class="btn-primary shop-add-to-cart" data-product-id="${product.id}" ${isOutOfStock ? 'disabled' : ''}>
+              ${isOutOfStock ? 'Sold Out' : 'Add to Cart'}
+            </button>
           </div>
-          <div class="product-price-shop" data-price-ngn="${product.price}">${formatPrice(product.price, currentCurrency)}</div>
+          <div class="product-price-shop" 
+               data-price-ngn="${product.price}"
+               data-sale-price-ngn="${isOnSale && salePrice ? salePrice * getExchangeRate('ZAR') : ''}"
+               data-on-sale="${isOnSale && !isOutOfStock ? 'true' : 'false'}">
+            ${isOnSale && !isOutOfStock ? `
+              <span class="original-price">${originalDisplayPrice}</span>
+              <span class="sale-price">${displayPrice}</span>
+            ` : displayPrice}
+          </div>
         </div>
       </div>
     `;
@@ -232,12 +276,21 @@ function attachShopCardHandlers() {
         existingItem.quantity += quantity;
         existingItem.id = product.supabase_id || existingItem.id;
         existingItem.slug = product.id;
+        // ✅ Add all sale fields
+        existingItem.sale_price = product.sale_price || null;
+        existingItem.on_sale = product.on_sale || false;
+        existingItem.sale_start = product.sale_start || null;
+        existingItem.sale_end = product.sale_end || null;
       } else {
         cart.push({
           id: product.supabase_id || product.id,
           slug: product.id,
           name: product.name,
           price: product.price,
+          sale_price: product.sale_price || null,
+          on_sale: product.on_sale || false,
+          sale_start: product.sale_start || null,
+          sale_end: product.sale_end || null,
           quantity: quantity,
           image: product.image
         });

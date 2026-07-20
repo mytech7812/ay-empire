@@ -7,6 +7,17 @@ const cartEmpty = document.getElementById('cart-empty');
 const cartSubtotal = document.getElementById('cart-subtotal');
 const cartTotal = document.getElementById('cart-total');
 
+// ===== SALE UTILITY (using global isSaleActive) =====
+function getCartItemEffectivePrice(item) {
+  const rate = getExchangeRate('ZAR') || 84;
+  return isSaleActive(item) ? Number(item.sale_price) * rate : Number(item.price || 0);
+}
+
+function getCartItemEffectivePrice(item) {
+  const rate = getExchangeRate('ZAR') || 84;
+  return isSaleActive(item) ? Number(item.sale_price) * rate : Number(item.price || 0);
+}
+
 // ===== VERIFY CART ITEMS AGAINST SUPABASE =====
 async function verifyCartItems() {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -31,55 +42,78 @@ async function verifyCartItems() {
     // Fetch products by UUID (id column)
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, slug, name, price, image_url');
+        .select('id, slug, name, price, image_url, sale_price, on_sale, sale_start, sale_end, stock');
 
     if (error) {
       console.error('Error fetching products:', error);
       return cart;
     }
 
-    // Create a map by UUID (id), with slug fallback for older carts
-    const productMap = {};
-    products.forEach(p => {
-      productMap[p.id] = {
-        id: p.id,
-        name: p.name,
-        price: p.price,
-        image: p.image_url || '/images/placeholder.jpg',
-        slug: p.slug
-      };
+const productMap = {};
+products.forEach(p => {
+  productMap[p.id] = {
+    id: p.id,
+    name: p.name,
+    price: p.price,
+    image: p.image_url || '/images/placeholder.jpg',
+    slug: p.slug,
+    sale_price: p.sale_price || null,
+    on_sale: p.on_sale || false,
+    sale_start: p.sale_start || null,
+    sale_end: p.sale_end || null,
+    stock: p.stock !== undefined && p.stock !== null ? p.stock : 0
+  };
 
-      if (p.slug) {
-        productMap[p.slug] = {
-          id: p.id,
-          name: p.name,
-          price: p.price,
-          image: p.image_url || '/images/placeholder.jpg',
-          slug: p.slug
-        };
-      }
-    });
+  if (p.slug) {
+    productMap[p.slug] = {
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      image: p.image_url || '/images/placeholder.jpg',
+      slug: p.slug,
+      sale_price: p.sale_price || null,
+      on_sale: p.on_sale || false,
+      sale_start: p.sale_start || null,
+      sale_end: p.sale_end || null,
+      stock: p.stock !== undefined && p.stock !== null ? p.stock : 0
+    };
+  }
+});
 
-    // Check each cart item by its UUID (id), falling back to legacy slugs
-    const verifiedItems = cart.map(item => {
-      const product = productMap[item.id] || (item.slug ? productMap[item.slug] : null);
-      if (product) {
-        return {
-          ...item,
-          id: product.id,
-          available: true,
-          name: product.name,
-          price: product.price,
-          image: product.image,
-          slug: product.slug
-        };
-      } else {
-        return {
-          ...item,
-          available: false
-        };
-      }
-    });
+const verifiedItems = cart.map(item => {
+  const product = productMap[item.id] || (item.slug ? productMap[item.slug] : null);
+  if (product) {
+    const isInStock = product.stock !== undefined && product.stock !== null && product.stock > 0;
+    const availableStock = product.stock || 0;
+    const quantityExceedsStock = availableStock > 0 && item.quantity > availableStock;
+    
+    return {
+      ...item,
+      id: product.id,
+      available: true,
+      inStock: isInStock,
+      quantityExceedsStock: quantityExceedsStock,
+      availableStock: availableStock,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      slug: product.slug,
+      sale_price: product.sale_price || null,
+      on_sale: product.on_sale || false,
+      sale_start: product.sale_start || null,
+      sale_end: product.sale_end || null,
+      stock: availableStock
+    };
+  } else {
+    return {
+      ...item,
+      available: false,
+      inStock: false,
+      quantityExceedsStock: false,
+      availableStock: 0
+    };
+  }
+});
 
     return verifiedItems;
 
@@ -113,7 +147,7 @@ async function loadCart() {
   }
   
   // Update localStorage with verified items (remove unavailable ones)
-  const availableItems = verifiedItems.filter(item => item.available);
+const availableItems = verifiedItems.filter(item => item.available && item.inStock);
   localStorage.setItem('cart', JSON.stringify(availableItems));
   
   updateCartBadge();
@@ -131,7 +165,6 @@ async function loadCart() {
   updateTotals(availableItems);
 }
 
-// ===== RENDER CART ITEMS =====
 function renderCartItems(cart) {
   cartItemsContainer.innerHTML = '';
 
@@ -142,6 +175,77 @@ function renderCartItems(cart) {
     if (!item.available) {
       itemElement.classList.add('cart-item-unavailable');
     }
+
+    const isOutOfStock = !item.inStock && item.available;
+    const exceedsStock = item.quantityExceedsStock && item.available && item.inStock;
+
+    if (isOutOfStock) {
+      itemElement.classList.add('cart-item-out-of-stock');
+    }
+    if (exceedsStock) {
+      itemElement.classList.add('cart-item-exceeds-stock');
+    }
+    
+    const saleActive = isSaleActive(item);
+    const effectivePrice = getCartItemEffectivePrice(item);
+    
+    // Build the HTML based on item status
+    let detailsHtml = '';
+    let totalHtml = '';
+    
+    if (item.available && item.inStock) {
+      // In stock - show normal cart item
+      detailsHtml = `
+        <div class="cart-item-price">
+          ${saleActive ? `
+            <span class="cart-original-price">${formatPrice(Number(item.price) || 0, currentCurrency)}</span>
+            <span class="cart-sale-price">${formatPrice(effectivePrice, currentCurrency)}</span>
+          ` : formatPrice(Number(item.price) || 0, currentCurrency)}
+        </div>
+        
+        ${exceedsStock ? `
+          <div class="cart-item-stock-warning">
+            ⚠️ Only ${item.availableStock} items of "${item.name}" available in stock. Please reduce quantity.
+          </div>
+        ` : ''}
+        
+        <div class="cart-item-actions">
+          <div class="cart-item-quantity">
+            <button class="qty-btn cart-qty-decrease" data-index="${index}">−</button>
+            <input type="number" class="cart-qty-input" value="${item.quantity}" min="1" max="${item.availableStock > 0 ? item.availableStock : 99}" data-index="${index}">
+            <button class="qty-btn cart-qty-increase" data-index="${index}">+</button>
+          </div>
+          <button class="cart-item-remove" data-index="${index}">Remove</button>
+        </div>
+      `;
+      
+      totalHtml = `
+        <div class="cart-item-total">
+          ${saleActive ? `
+            <span class="cart-original-total">${formatPrice(Number(item.price) * item.quantity, currentCurrency)}</span>
+            <span class="cart-sale-total">${formatPrice(effectivePrice * item.quantity, currentCurrency)}</span>
+          ` : formatPrice(Number(item.price) * item.quantity, currentCurrency)}
+        </div>
+      `;
+    } else if (item.available && !item.inStock) {
+      // Out of stock
+      detailsHtml = `
+        <div class="cart-item-out-of-stock-message">
+          ⚠️ This product is currently out of stock
+        </div>
+        <button class="cart-item-remove" data-index="${index}">Remove from cart</button>
+      `;
+      totalHtml = '';
+    } else {
+      // Unavailable (product no longer exists)
+      detailsHtml = `
+        <div class="cart-item-unavailable-message">
+          ⚠️ This product is no longer available
+        </div>
+        <button class="cart-item-remove" data-index="${index}">Remove from cart</button>
+      `;
+      totalHtml = '';
+    }
     
     itemElement.innerHTML = `
       <div class="cart-item-image">
@@ -149,28 +253,9 @@ function renderCartItems(cart) {
       </div>
       <div class="cart-item-details">
         <h3 class="cart-item-name">${item.name}</h3>
-        ${item.available ? `
-          <div class="cart-item-price">${formatPrice(item.price, currentCurrency)}</div>
-          <div class="cart-item-actions">
-            <div class="cart-item-quantity">
-              <button class="qty-btn cart-qty-decrease" data-index="${index}">−</button>
-              <input type="number" class="cart-qty-input" value="${item.quantity}" min="1" max="99" data-index="${index}">
-              <button class="qty-btn cart-qty-increase" data-index="${index}">+</button>
-            </div>
-            <button class="cart-item-remove" data-index="${index}">Remove</button>
-          </div>
-        ` : `
-          <div class="cart-item-unavailable-message">
-            ⚠️ This product is no longer available
-          </div>
-          <button class="cart-item-remove" data-index="${index}">Remove from cart</button>
-        `}
+        ${detailsHtml}
       </div>
-      ${item.available ? `
-        <div class="cart-item-total">
-          ${formatPrice(item.price * item.quantity, currentCurrency)}
-        </div>
-      ` : ''}
+      ${totalHtml}
     `;
 
     cartItemsContainer.appendChild(itemElement);
@@ -255,21 +340,40 @@ function removeItem(index) {
 
 // ===== UPDATE TOTALS =====
 function updateTotals(cart) {
-  const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  // Calculate subtotal using the active sale price when applicable
+  const subtotal = cart.reduce((sum, item) => {
+    const price = getCartItemEffectivePrice(item);
+    return sum + (price * item.quantity);
+  }, 0);
   
   cartSubtotal.textContent = formatPrice(subtotal, currentCurrency);
   cartTotal.textContent = formatPrice(subtotal, currentCurrency);
 }
 
-// ===== CHECK IF CART HAS UNAVAILABLE ITEMS =====
 function canProceedToCheckout() {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
-  const hasUnavailable = cart.some(item => item.available === false);
   
+  // Check for unavailable items
+  const hasUnavailable = cart.some(item => item.available === false);
   if (hasUnavailable) {
     showToast('Please remove unavailable items before proceeding.');
     return false;
   }
+  
+  // Check for out-of-stock items
+  const hasOutOfStock = cart.some(item => !item.inStock && item.available);
+  if (hasOutOfStock) {
+    showToast('Some items in your cart are out of stock. Please remove them.');
+    return false;
+  }
+  
+  // Check for quantity exceeding stock
+  const exceedsStock = cart.some(item => item.quantityExceedsStock && item.available && item.inStock);
+  if (exceedsStock) {
+    showToast('Please reduce the quantity of items that exceed available stock.');
+    return false;
+  }
+  
   return true;
 }
 

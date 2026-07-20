@@ -6,6 +6,10 @@ let currentExchangeRate = 84; // ZAR fallback (84 NGN = 1 ZAR)
 let currentUsdRate = 1400;    // USD fallback
 const PRODUCTS_CACHE_KEY = 'ay_empire_products_cache_v1';
 
+function getCurrentProductFilter() {
+  return document.body.dataset.productFilter || new URLSearchParams(window.location.search).get('filter') || 'all';
+}
+
 function clearPublicProductsCache() {
   try {
     localStorage.removeItem(PRODUCTS_CACHE_KEY);
@@ -173,18 +177,24 @@ function getProductDescription(description) {
   return cleanDescription.length > 120 ? `${cleanDescription.slice(0, 120)}...` : cleanDescription;
 }
 
-// ===== LOAD PRODUCTS =====
-async function loadProducts() {
+async function loadProducts(filter = 'all') {
   const grid = document.getElementById('products-grid');
   if (!grid) return;
 
   grid.innerHTML = '<div class="loading-message">Loading products...</div>';
 
   try {
-    const { data: products, error } = await _supabase
+    let query = _supabase
       .from('products')
       .select('*')
       .order('created_at', { ascending: false });
+
+    // ✅ Apply filter if 'sale' is passed
+    if (filter === 'sale') {
+      query = query.eq('on_sale', true);
+    }
+
+    const { data: products, error } = await query;
 
     if (error) throw error;
 
@@ -198,46 +208,61 @@ async function loadProducts() {
       return;
     }
 
-    grid.innerHTML = products.map(product => {
-      const stockMeta = getStockMeta(product.stock);
-      const category = product.category || 'Uncategorized';
-      const imageUrl = product.image_url || '/images/placeholder.jpg';
-      const zarPrice = product.price_zar ? `R${Number(product.price_zar).toLocaleString()}` : 'Auto';
+grid.innerHTML = products.map(product => {
+  const stockMeta = getStockMeta(product.stock);
+  const category = product.category || 'Uncategorized';
+  const imageUrl = product.image_url || '/images/placeholder.jpg';
+  const zarPrice = product.price_zar ? `R${Number(product.price_zar).toLocaleString()}` : 'Auto';
 
-      return `
-        <article class="product-admin-card" data-id="${escapeHtml(product.id)}">
-          <div class="product-card-image-wrap">
-            <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(product.name)}" class="product-card-image">
-            <span class="product-card-category">${escapeHtml(category)}</span>
+  return `
+    <article class="product-admin-card" data-id="${escapeHtml(product.id)}">
+      <div class="product-card-image-wrap">
+        <img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(product.name)}" class="product-card-image">
+        <span class="product-card-category">${escapeHtml(category)}</span>
+      </div>
+
+      <div class="product-card-body">
+        <div class="product-card-heading">
+          <h3>${escapeHtml(product.name)}</h3>
+          <div class="product-card-heading-badges">
+            ${product.on_sale && product.sale_price && product.sale_price > 0 ? `<span class="product-sale-badge">SALE</span>` : ''}
+            <span class="product-stock-pill ${stockMeta.className}">${escapeHtml(stockMeta.label)}</span>
           </div>
+        </div>
 
-          <div class="product-card-body">
-            <div class="product-card-heading">
-              <h3>${escapeHtml(product.name)}</h3>
-              <span class="product-stock-pill ${stockMeta.className}">${escapeHtml(stockMeta.label)}</span>
-            </div>
+        <p class="product-card-description">${escapeHtml(getProductDescription(product.description))}</p>
 
-            <p class="product-card-description">${escapeHtml(getProductDescription(product.description))}</p>
-
-            <div class="product-card-meta">
-              <div>
-                <span class="product-card-label">NGN Price</span>
-                <strong>${formatNaira(product.price)}</strong>
-              </div>
-              <div>
-                <span class="product-card-label">ZAR Price</span>
-                <strong>${escapeHtml(zarPrice)}</strong>
-              </div>
-            </div>
-
-            <div class="product-card-actions">
-              <button class="edit-product-btn" data-id="${escapeHtml(product.id)}" type="button">Edit</button>
-              <button class="delete-product-btn" data-id="${escapeHtml(product.id)}" type="button">Delete</button>
-            </div>
+        <div class="product-card-meta">
+          <div>
+            <span class="product-card-label">NGN Price</span>
+            <strong>${formatNaira(product.price)}</strong>
           </div>
-        </article>
-      `;
-    }).join('');
+          <div>
+            <span class="product-card-label">ZAR Price</span>
+            <strong>${escapeHtml(zarPrice)}</strong>
+          </div>
+        </div>
+
+        ${product.on_sale && product.sale_price && product.sale_price > 0 ? `
+          <div class="product-sale-info">
+            <span class="sale-price-label">Sale Price:</span>
+            <strong>R${Number(product.sale_price).toLocaleString()}</strong>
+            <span class="sale-date-range">
+              ${product.sale_start ? new Date(product.sale_start).toLocaleDateString() : ''}
+              → 
+              ${product.sale_end ? new Date(product.sale_end).toLocaleDateString() : ''}
+            </span>
+          </div>
+        ` : ''}
+
+        <div class="product-card-actions">
+          <button class="edit-product-btn" data-id="${escapeHtml(product.id)}" type="button">Edit</button>
+          <button class="delete-product-btn" data-id="${escapeHtml(product.id)}" type="button">Delete</button>
+        </div>
+      </div>
+    </article>
+  `;
+}).join('');
 
     document.querySelectorAll('.edit-product-btn').forEach(btn => {
       btn.addEventListener('click', function() {
@@ -322,10 +347,15 @@ function openAddProductModal() {
   document.getElementById('image-preview').style.display = 'none';
   document.getElementById('image-preview-img').src = '#';
 
+  document.getElementById('product-on-sale').checked = false;
+  document.getElementById('sale-fields').style.display = 'none';
+  document.getElementById('product-sale-price').value = '';
+  document.getElementById('product-sale-start').value = '';
+  document.getElementById('product-sale-end').value = '';
+
   modal.style.display = 'flex';
 }
 
-// ===== OPEN EDIT PRODUCT MODAL =====
 function openEditProductModal(product) {
   const modal = document.getElementById('product-modal');
   const title = document.getElementById('modal-product-title');
@@ -344,6 +374,31 @@ function openEditProductModal(product) {
   document.getElementById('product-category').value = product.category || '';
   document.getElementById('product-stock').value = product.stock || 10;
   document.getElementById('product-image').value = '';
+
+  // Load sale fields
+  const onSaleCheckbox = document.getElementById('product-on-sale');
+  const saleFields = document.getElementById('sale-fields');
+  const salePriceInput = document.getElementById('product-sale-price');
+  const saleStartInput = document.getElementById('product-sale-start');
+  const saleEndInput = document.getElementById('product-sale-end');
+
+  if (product.on_sale) {
+    onSaleCheckbox.checked = true;
+    saleFields.style.display = 'block';
+    salePriceInput.value = product.sale_price || '';
+    if (product.sale_start) {
+      saleStartInput.value = new Date(product.sale_start).toISOString().split('T')[0];
+    }
+    if (product.sale_end) {
+      saleEndInput.value = new Date(product.sale_end).toISOString().split('T')[0];
+    }
+  } else {
+    onSaleCheckbox.checked = false;
+    saleFields.style.display = 'none';
+    salePriceInput.value = '';
+    saleStartInput.value = '';
+    saleEndInput.value = '';
+  }
 
   if (product.image_url) {
     previewImg.src = product.image_url;
@@ -382,6 +437,48 @@ async function saveProduct(event) {
   const imageFile = document.getElementById('product-image').files[0];
   const existingImageUrl = document.getElementById('product-image-url').value;
 
+  // ===== GET SALE FIELDS =====
+  const onSale = document.getElementById('product-on-sale').checked;
+  const salePriceInput = document.getElementById('product-sale-price').value.trim();
+  const saleStart = document.getElementById('product-sale-start').value;
+  const saleEnd = document.getElementById('product-sale-end').value;
+
+// ===== SALE VALIDATION =====
+if (onSale) {
+  const salePrice = parseInt(salePriceInput);
+  const originalPriceZar = priceZar; // priceZar is already defined above
+  
+  if (!salePriceInput || isNaN(salePrice) || salePrice <= 0) {
+    showToast('Please enter a valid sale price (must be greater than 0).', 'warning');
+    document.getElementById('product-sale-price').focus();
+    return;
+  }
+  
+  // ✅ NEW: Ensure sale price is lower than original price
+  if (salePrice >= originalPriceZar) {
+    showToast(`Sale price (R${salePrice}) must be lower than the original price (R${originalPriceZar}).`, 'warning');
+    document.getElementById('product-sale-price').focus();
+    return;
+  }
+  
+  if (!saleStart) {
+    showToast('Please select a sale start date.', 'warning');
+    document.getElementById('product-sale-start').focus();
+    return;
+  }
+  if (!saleEnd) {
+    showToast('Please select a sale end date.', 'warning');
+    document.getElementById('product-sale-end').focus();
+    return;
+  }
+  if (new Date(saleStart) > new Date(saleEnd)) {
+    showToast('Sale start date must be before or on the end date.', 'warning');
+    document.getElementById('product-sale-start').focus();
+    return;
+  }
+}
+
+  // ===== VALIDATE REQUIRED FIELDS =====
   if (!name || !slug || !priceZar || !category) {
     showToast('Please fill in all required fields.', 'warning');
     return;
@@ -411,6 +508,11 @@ async function saveProduct(event) {
 
     let result;
 
+    // Get sale fields for saving
+    const salePrice = onSale ? parseInt(salePriceInput) : null;
+    const saleStartValue = onSale ? saleStart : null;
+    const saleEndValue = onSale ? saleEnd : null;
+
     if (id) {
       result = await _supabase
         .from('products')
@@ -422,7 +524,11 @@ async function saveProduct(event) {
           price_zar: priceZar,
           category,
           image_url: imageUrl,
-          stock,
+          stock: stock || 0,
+          on_sale: onSale,
+          sale_price: salePrice,
+          sale_start: saleStartValue,
+          sale_end: saleEndValue,
           updated_at: new Date().toISOString()
         })
         .eq('id', id);
@@ -437,7 +543,11 @@ async function saveProduct(event) {
           price_zar: priceZar,
           category,
           image_url: imageUrl,
-          stock
+          stock: stock || 0,
+          on_sale: onSale,
+          sale_price: salePrice,
+          sale_start: saleStartValue,
+          sale_end: saleEndValue
         });
     }
 
@@ -446,7 +556,7 @@ async function saveProduct(event) {
     clearPublicProductsCache();
     showToast(id ? 'Product updated successfully!' : 'Product added successfully!', 'success');
     closeProductModal();
-    loadProducts();
+    loadProducts(getCurrentProductFilter());
 
   } catch (error) {
     console.error('Save product error:', error);
@@ -498,7 +608,7 @@ async function deleteProduct(productId) {
     clearPublicProductsCache();
     showToast('Product deleted successfully!', 'success');
     closeDeleteModal();
-    loadProducts();
+    loadProducts(getCurrentProductFilter());
 
   } catch (error) {
     console.error('Delete product error:', error);
@@ -590,49 +700,70 @@ document.addEventListener('DOMContentLoaded', function() {
     removeImageBtn.addEventListener('click', removeImage);
   }
 
+  // ===== SALE FIELDS TOGGLE =====
+  const onSaleCheckbox = document.getElementById('product-on-sale');
+  const saleFields = document.getElementById('sale-fields');
+
+  if (onSaleCheckbox && saleFields) {
+    onSaleCheckbox.addEventListener('change', function() {
+      if (this.checked) {
+        saleFields.style.display = 'block';
+      } else {
+        saleFields.style.display = 'none';
+        // Clear sale fields when unchecked
+        const salePrice = document.getElementById('product-sale-price');
+        const saleStart = document.getElementById('product-sale-start');
+        const saleEnd = document.getElementById('product-sale-end');
+        if (salePrice) salePrice.value = '';
+        if (saleStart) saleStart.value = '';
+        if (saleEnd) saleEnd.value = '';
+      }
+    });
+  }
+
   // ===== EXCHANGE RATE: Load rate on page load =====
   fetchExchangeRate();
 
-// ===== EXCHANGE RATE: Update rate handler (SYNC TO SUPABASE) =====
-const updateRateBtn = document.getElementById('update-rate-btn');
-if (updateRateBtn) {
-  updateRateBtn.addEventListener('click', async function() {
-    const input = document.getElementById('exchange-rate');
-    const newRate = parseInt(input.value);
-    if (newRate && newRate > 0) {
-      try {
-        // ✅ Direct fetch with admin API key header
-        const response = await fetch('https://iirctokpamybsmgzstnj.supabase.co/functions/v1/rates', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-admin-key': 'ayempire_admin_2026_secure_key_12345'
-          },
-          body: JSON.stringify({ zar_rate: newRate }),
-        });
+  // ===== EXCHANGE RATE: Update rate handler (SYNC TO SUPABASE) =====
+  const updateRateBtn = document.getElementById('update-rate-btn');
+  if (updateRateBtn) {
+    updateRateBtn.addEventListener('click', async function() {
+      const input = document.getElementById('exchange-rate');
+      const newRate = parseInt(input.value);
+      if (newRate && newRate > 0) {
+        try {
+          // ✅ Direct fetch with admin API key header
+          const response = await fetch('https://iirctokpamybsmgzstnj.supabase.co/functions/v1/rates', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-admin-key': ADMIN_API_KEY
+            },
+            body: JSON.stringify({ zar_rate: newRate }),
+          });
 
-        const data = await response.json();
+          const data = await response.json();
 
-        if (!response.ok) {
-          throw new Error(data.error || 'Failed to sync rate');
+          if (!response.ok) {
+            throw new Error(data.error || 'Failed to sync rate');
+          }
+
+          // Update local storage after successful sync
+          localStorage.setItem('exchange_rate_zar', newRate.toString());
+          currentExchangeRate = newRate;
+          updateRateDisplay();
+          updateRateDisplayInForm();
+          
+          showToast('Exchange rate updated and synced across all devices!', 'success');
+        } catch (error) {
+          console.error('Rate sync error:', error);
+          showToast('Failed to sync rate. Please try again.', 'error');
         }
-
-        // Update local storage after successful sync
-        localStorage.setItem('exchange_rate_zar', newRate.toString());
-        currentExchangeRate = newRate;
-        updateRateDisplay();
-        updateRateDisplayInForm();
-        
-        showToast('Exchange rate updated and synced across all devices!', 'success');
-      } catch (error) {
-        console.error('Rate sync error:', error);
-        showToast('Failed to sync rate. Please try again.', 'error');
+      } else {
+        showToast('Please enter a valid exchange rate.', 'warning');
       }
-    } else {
-      showToast('Please enter a valid exchange rate.', 'warning');
-    }
-  });
-}
+    });
+  }
 
-loadProducts();
+  loadProducts(getCurrentProductFilter());
 });

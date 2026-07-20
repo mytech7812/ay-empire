@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Products | Admin Panel</title>
+  <title>Sales | Admin Panel</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="admin.css">
 </head>
-<body>
+<body data-product-filter="sale">
   <!-- Admin Nav -->
   <nav class="admin-nav">
     <a href="dashboard.html" class="admin-nav-brand">AY Empire <span>Admin</span></a>
     <ul class="admin-nav-links">
       <li><a href="dashboard.html">Dashboard</a></li>
       <li><a href="orders.html">Orders</a></li>
-      <li><a href="products.html" class="active">Products</a></li>
-        <li><a href="sales.html">Sales</a></li>
+      <li><a href="products.html">Products</a></li>
+        <li><a href="sales.html" class="active">Sales</a></li>
       <li><a href="#" id="logout-btn">Logout</a></li>
     </ul>
   </nav>
@@ -23,8 +23,8 @@
   <!-- Products Content -->
   <main class="admin-main">
     <div class="admin-header">
-      <h1>Products</h1>
-      <p>Manage your product catalog.</p>
+      <h1>Sales</h1>
+      <p>Manage products currently on sale.</p>
     </div>
 
   <!-- Product Tools -->

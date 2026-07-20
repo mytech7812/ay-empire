@@ -29,6 +29,10 @@
     {
       "source": "/admin/products",
       "destination": "/admin/products.html"
+    },
+    {
+      "source": "/admin/sales",
+      "destination": "/admin/sales.html"
     }
   ]
 }

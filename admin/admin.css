@@ -938,3 +938,68 @@
     min-height: auto;
   }
 }
+
+/* ===== ADMIN SALE BADGE ===== */
+.product-card-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.product-card-heading-badges {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.product-sale-badge {
+  background: #e74c3c;
+  color: #fff;
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  animation: pulseBadge 2s ease-in-out infinite;
+}
+
+@keyframes pulseBadge {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.product-sale-info {
+  margin-top: 0.3rem;
+  padding: 0.3rem 0.5rem;
+  background: rgba(231, 76, 60, 0.06);
+  border-left: 3px solid #e74c3c;
+  border-radius: 2px;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.sale-price-label {
+  color: var(--text-mid);
+  font-weight: 500;
+}
+
+.product-sale-info strong {
+  color: #e74c3c;
+  font-weight: 700;
+}
+
+.sale-date-range {
+  color: var(--text-mid);
+  font-size: 0.7rem;
+}

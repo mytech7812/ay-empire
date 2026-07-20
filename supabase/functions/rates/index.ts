@@ -8,7 +8,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, x-admin-key',
 };
 
 // ⚠️ In a real production environment, use a proper admin auth check

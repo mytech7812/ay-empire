@@ -119,6 +119,19 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ===== SERVER-SIDE EXCHANGE RATE (FETCH ONCE AT START) =====
+    const { data: rateData, error: rateError } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'exchange_rate_zar')
+      .single();
+
+    const serverRate = rateData ? parseInt(rateData.value) : 84;
+
+    if (rateError) {
+      console.error('Rate fetch error:', rateError);
+    }
+
     // ===== LOOK UP PRODUCTS BY BOTH ID AND SLUG =====
     const productIds = items.map((item: any) => item.id);
     const slugs = items.map((item: any) => item.slug || item.id);
@@ -126,7 +139,7 @@ Deno.serve(async (req) => {
     // Query by both UUID and slug
     const { data: products, error } = await supabase
       .from('products')
-      .select('id, slug, name, price')
+      .select('id, slug, name, price, on_sale, sale_price, sale_start, sale_end, stock')
       .or(`id.in.(${productIds.join(',')}),slug.in.(${slugs.map((s: string) => `'${s}'`).join(',')})`);
 
     if (error) {
@@ -134,14 +147,9 @@ Deno.serve(async (req) => {
       throw new Error('Failed to fetch products');
     }
 
-    // Build price map keyed by both UUID and slug
-    const priceMap: Record<string, number> = {};
+    // Build product map keyed by both UUID and slug
     const productMap: Record<string, any> = {};
     products?.forEach((p: any) => {
-      priceMap[p.id] = p.price;
-      if (p.slug) {
-        priceMap[p.slug] = p.price;
-      }
       productMap[p.id] = p;
       if (p.slug) {
         productMap[p.slug] = p;
@@ -152,6 +160,7 @@ Deno.serve(async (req) => {
     let subtotal = 0;
     const orderItems = [];
     const invalidItems = [];
+    const stockErrors = [];
 
     for (const item of items) {
       const product = productMap[item.id] || productMap[item.slug];
@@ -162,16 +171,74 @@ Deno.serve(async (req) => {
       }
       
       const realPrice = product.price || 0;
-      const quantity = parseInt(item.quantity) || 1;
-      subtotal += realPrice * quantity;
+      
+      // ✅ STRICT QUANTITY VALIDATION
+      const quantityRaw = parseInt(item.quantity);
+      
+      // Check if quantity is a valid positive integer
+      if (isNaN(quantityRaw) || !Number.isInteger(quantityRaw) || quantityRaw <= 0 || quantityRaw > 999) {
+        return new Response(
+          JSON.stringify({ 
+            error: `Invalid quantity for "${product.name}". Please use a valid whole number between 1 and 999.` 
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
+      const quantity = quantityRaw;
+
+      // ===== STOCK VALIDATION =====
+      const availableStock = product.stock !== undefined && product.stock !== null ? product.stock : 999;
+      if (availableStock !== 999 && availableStock < quantity) {
+        stockErrors.push({
+          name: product.name,
+          requested: quantity,
+          available: availableStock
+        });
+        continue;
+      }
+      
+      // ===== SALE PRICE CHECK WITH DATE VALIDATION =====
+      const now = new Date();
+      let startDate = product.sale_start ? new Date(product.sale_start) : null;
+      let endDate = product.sale_end ? new Date(product.sale_end) : null;
+      
+      // ✅ FIX: Normalize end date to end of day (11:59:59 PM)
+      if (endDate) {
+        endDate.setHours(23, 59, 59, 999);
+      }
+      
+      let isOnSale = false;
+      let salePriceZar = 0;
+      let salePriceNgn = 0;
+
+      // Server must use database values only for sale validation.
+      const saleStart = startDate;
+      const saleEnd = endDate;
+
+      if (product.on_sale && product.sale_price && product.sale_price > 0) {
+        if ((!saleStart || now >= saleStart) && (!saleEnd || now <= saleEnd)) {
+          isOnSale = true;
+          salePriceZar = product.sale_price;
+          // Convert sale price from ZAR to NGN
+          salePriceNgn = salePriceZar * serverRate;
+        }
+      }
+
+      // Use sale price (converted to NGN) if on sale, otherwise use regular price
+      const effectivePrice = isOnSale ? salePriceNgn : realPrice;
+      subtotal += effectivePrice * quantity;
       
       orderItems.push({
         id: product.id,
         slug: product.slug,
         name: product.name,
         quantity: quantity,
-        price: realPrice,
-        total: realPrice * quantity,
+        price: effectivePrice,
+        original_price: realPrice,
+        sale_price_zar: isOnSale ? salePriceZar : null,
+        is_on_sale: isOnSale,
+        total: effectivePrice * quantity,
       });
     }
 
@@ -187,21 +254,24 @@ Deno.serve(async (req) => {
       );
     }
 
+    // ✅ Reject stock errors
+    if (stockErrors.length > 0) {
+      const firstError = stockErrors[0];
+      return new Response(
+        JSON.stringify({ 
+          error: `Only ${firstError.available} units of "${firstError.name}" available. You requested ${firstError.requested}.`,
+          stock_errors: stockErrors
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     if (orderItems.length === 0) {
       return new Response(
         JSON.stringify({ error: 'Your cart is empty or contains invalid items.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    // ===== SERVER-SIDE EXCHANGE RATE =====
-    const { data: rateData, error: rateError } = await supabase
-      .from('settings')
-      .select('value')
-      .eq('key', 'exchange_rate_zar')
-      .single();
-
-    const serverRate = rateData ? parseInt(rateData.value) : 84;
 
     // ===== SERVER-SIDE SHIPPING CALCULATION =====
     let shippingNgn = 0;
@@ -223,6 +293,15 @@ Deno.serve(async (req) => {
 
     // ===== CREATE ORDER =====
     const totalNgn = subtotal + shippingNgn;
+    
+    // ✅ FIX: Reject orders with zero or negative total
+    if (totalNgn <= 0) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid order total. Please check your cart and try again.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     const totalZar = Math.round(totalNgn / serverRate);
     const orderNumber = generateOrderNumber();
     const currencyUsed = currency || 'NGN';

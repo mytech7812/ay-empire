@@ -40,7 +40,12 @@ function mapProduct(p) {
     description: p.description || '',
     image: p.image_url || p.image || '/images/placeholder.jpg',
     supabase_id: p.id || p.supabase_id,
-    stock: p.stock !== undefined && p.stock !== null ? p.stock : 'In Stock'
+    stock: p.stock !== undefined && p.stock !== null ? p.stock : 'In Stock',
+    on_sale: p.on_sale || false,
+    sale_price: p.sale_price || null,
+    sale_start: p.sale_start || null,
+    sale_end: p.sale_end || null,
+    price_zar: p.price_zar || null
   };
 }
 
@@ -53,12 +58,8 @@ function cacheProduct(product) {
 
 // ===== LOAD PRODUCT FROM SUPABASE =====
 async function loadProductFromSupabase(productId) {
-  const cachedProducts = getCachedProducts();
-  const cachedProduct = cachedProducts?.find(product => product.id === productId);
-
-  if (cachedProduct) {
-    return cachedProduct;
-  }
+  // ⚠️ Only use cache as a fallback if the database fetch fails
+  // Always fetch from Supabase for product detail page
 
   try {
     const { data, error } = await _supabase
@@ -70,15 +71,32 @@ async function loadProductFromSupabase(productId) {
     if (error) throw error;
 
     if (!data) {
+      // If not found in database, try cache as last resort
+      const cachedProducts = getCachedProducts();
+      const cachedProduct = cachedProducts?.find(product => product.id === productId);
+      if (cachedProduct) {
+        console.log('Using cached product (fallback)');
+        return cachedProduct;
+      }
       return null;
     }
 
     const product = mapProduct(data);
+    // Update cache with fresh data
     cacheProduct(product);
+    console.log('Product loaded from database:', product);
     return product;
 
   } catch (error) {
-    console.error('Error loading product:', error);
+    console.error('Error loading product from database:', error);
+    
+    // Fallback to cache if database fails
+    const cachedProducts = getCachedProducts();
+    const cachedProduct = cachedProducts?.find(product => product.id === productId);
+    if (cachedProduct) {
+      console.log('Using cached product (error fallback)');
+      return cachedProduct;
+    }
     return null;
   }
 }
@@ -112,12 +130,71 @@ document.addEventListener('DOMContentLoaded', async function() {
   document.getElementById('product-image').alt = product.name;
   document.getElementById('product-category').textContent = product.category;
   document.getElementById('product-name').textContent = product.name;
-  const priceEl = document.getElementById('product-price');
-  priceEl.textContent = formatPrice(product.price, currentCurrency);
+
+
+// ✅ Use centralized isSaleActive function
+const isOnSale = isSaleActive(product);
+const salePrice = isOnSale ? product.sale_price : null;
+let discountPercent = 0;
+
+if (isOnSale && salePrice) {
+  const originalPrice = product.price_zar || Math.round(product.price / getExchangeRate('ZAR'));
+  discountPercent = Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+}
+
+const priceEl = document.getElementById('product-price');
+if (isOnSale && salePrice) {
+  const salePriceNgn = salePrice * getExchangeRate('ZAR');
+  const displaySalePrice = formatPrice(salePriceNgn, currentCurrency);
+  const displayOriginalPrice = formatPrice(product.price, currentCurrency);
+  priceEl.innerHTML = `
+    <span class="original-price">${displayOriginalPrice}</span>
+    <span class="sale-price">${displaySalePrice}</span>
+    <span class="sale-ribbon product-sale-ribbon">${discountPercent}% OFF</span>
+  `;
+  // ✅ Add these two lines
   priceEl.dataset.priceNgn = product.price;
+  priceEl.dataset.salePriceNgn = salePriceNgn;
+  priceEl.dataset.onSale = 'true';
+} else {
+  priceEl.textContent = formatPrice(product.price, currentCurrency);
+  // ✅ Keep this
+  priceEl.dataset.priceNgn = product.price;
+  priceEl.dataset.salePriceNgn = '';
+  priceEl.dataset.onSale = 'false';
+}
+
   document.getElementById('product-description').textContent = product.description;
   document.getElementById('meta-category').textContent = product.category;
-  document.getElementById('meta-stock').textContent = typeof product.stock === 'number' ? (product.stock > 0 ? 'In Stock' : 'Out of Stock') : product.stock;
+
+  // ===== STOCK CHECK =====
+  const isOutOfStock = product.stock !== undefined && product.stock !== null && product.stock <= 0;
+  const stockAvailable = product.stock !== undefined && product.stock !== null ? product.stock : 999;
+
+  document.getElementById('meta-stock').textContent = isOutOfStock ? 'Out of Stock' : (stockAvailable > 0 ? 'In Stock' : 'Out of Stock');
+
+  // Update add to cart button
+  const addToCartBtn = document.getElementById('add-to-cart');
+  if (addToCartBtn) {
+    if (isOutOfStock) {
+      addToCartBtn.disabled = true;
+      addToCartBtn.textContent = 'Sold Out';
+    } else {
+      addToCartBtn.disabled = false;
+      addToCartBtn.textContent = 'Add to Cart';
+    }
+  }
+
+  // Update quantity input max
+  const qtyInput = document.getElementById('quantity');
+  if (qtyInput) {
+    qtyInput.max = isOutOfStock ? 0 : stockAvailable;
+    if (isOutOfStock) {
+      qtyInput.disabled = true;
+    } else {
+      qtyInput.disabled = false;
+    }
+  }
 
   // Update page title
   document.title = product.name + ' | AY Empire';
@@ -183,21 +260,36 @@ if (addToCartBtn) {
 
     const quantity = parseInt(qtyInput.value);
 
+    // Check if product is out of stock
+    if (product.stock !== undefined && product.stock !== null && product.stock <= 0) {
+      showToast('This product is out of stock.', '⚠️');
+      return;
+    }
+
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
     const existingItem = cart.find(item => {
       return item.id === (product.supabase_id || product.id) || item.slug === product.id;
     });
 
-    if (existingItem) {
-      existingItem.quantity += quantity;
-      existingItem.id = product.supabase_id || existingItem.id;
-      existingItem.slug = product.id;
-    } else {
+if (existingItem) {
+  existingItem.quantity += quantity;
+  existingItem.id = product.supabase_id || existingItem.id;
+  existingItem.slug = product.id;
+  // ✅ Update ALL sale info
+  existingItem.sale_price = product.sale_price || null;
+  existingItem.on_sale = product.on_sale || false;
+  existingItem.sale_start = product.sale_start || null;  // ✅ ADD THIS
+  existingItem.sale_end = product.sale_end || null;      // ✅ ADD THIS
+}else {
       cart.push({
         id: product.supabase_id || product.id,
         slug: product.id,
         name: product.name,
         price: product.price,
+        sale_price: product.sale_price || null,
+        on_sale: product.on_sale || false,
+        sale_start: product.sale_start || null,
+        sale_end: product.sale_end || null,
         quantity: quantity,
         image: product.image
       });

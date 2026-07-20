@@ -48,6 +48,48 @@ async function verifyTransaction(reference: string): Promise<boolean> {
   return data.status && data.data.status === 'success';
 }
 
+// ===== DEDUCT STOCK =====
+async function deductStock(order: any) {
+  if (!order || !order.items || order.items.length === 0) {
+    console.log('No items to deduct stock for.');
+    return;
+  }
+
+  for (const item of order.items) {
+    try {
+      // Find the product by id (UUID)
+      const { data: product, error: productError } = await supabase
+        .from('products')
+        .select('id, stock, name')
+        .eq('id', item.id)
+        .single();
+
+      if (productError) {
+        console.error(`Product lookup error for ${item.name}:`, productError);
+        continue;
+      }
+
+      if (product) {
+        const currentStock = product.stock || 0;
+        const newStock = Math.max(0, currentStock - item.quantity);
+        
+        const { error: updateError } = await supabase
+          .from('products')
+          .update({ stock: newStock })
+          .eq('id', product.id);
+
+        if (updateError) {
+          console.error(`Stock update error for ${item.name}:`, updateError);
+        } else {
+          console.log(`Stock deducted for ${item.name}: ${currentStock} → ${newStock}`);
+        }
+      }
+    } catch (error) {
+      console.error(`Error processing stock for ${item.name}:`, error);
+    }
+  }
+}
+
 // ===== SEND CONFIRMATION EMAIL =====
 async function sendConfirmationEmail(order: any) {
   if (!resendApiKey) {
@@ -324,8 +366,14 @@ Deno.serve(async (req) => {
 
       if (order) {
         console.log(`Order ${reference} updated to paid`);
+        
+        // ===== DEDUCT STOCK =====
+        await deductStock(order);
+        console.log(`Stock deducted for order ${reference}`);
+        
         await sendConfirmationEmail(order);
-        console.log(`Email sent for order ${reference}`);
+        console.log(`Customer email sent for order ${reference}`);
+        
         await sendAdminNotification(order);
         console.log(`Admin notification sent for order ${reference}`);
       }

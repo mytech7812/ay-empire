@@ -212,30 +212,57 @@ function updatePrices(currency) {
   
   const display = document.getElementById('currency-display');
   if (display) {
-    const symbols = { ZAR: 'R ZAR', USD: '$ USD' }; // Removed NGN
+    const symbols = { NGN: '₦ NGN', ZAR: 'R ZAR', USD: '$ USD' };
     display.textContent = symbols[currency] || 'R ZAR';
   }
   
-  // Update all price elements
+  // ✅ Update prices without destroying sale structure
   document.querySelectorAll('[data-price-ngn]').forEach(el => {
     const priceNgn = parseInt(el.dataset.priceNgn);
-    el.textContent = formatPrice(priceNgn, currency);
-  });
-  
-  document.querySelectorAll('.product-price-shop').forEach(el => {
-    const priceNgn = parseInt(el.dataset.priceNgn);
-    if (priceNgn) {
+    const salePriceNgn = parseInt(el.dataset.salePriceNgn) || null;
+    const onSale = el.dataset.onSale === 'true';
+    
+    if (onSale && salePriceNgn) {
+      // Check if the sale is still active (use data attributes from product)
+      // This preserves the sale structure
+      const originalSpan = el.querySelector('.original-price');
+      const saleSpan = el.querySelector('.sale-price');
+      
+      if (originalSpan && saleSpan) {
+        originalSpan.textContent = formatPrice(priceNgn, currency);
+        saleSpan.textContent = formatPrice(salePriceNgn, currency);
+      } else {
+        // Fallback: show only the sale price
+        el.textContent = formatPrice(salePriceNgn, currency);
+      }
+    } else {
+      // No sale: show regular price
       el.textContent = formatPrice(priceNgn, currency);
     }
   });
   
-  const productPrice = document.getElementById('product-price');
-  if (productPrice) {
-    const priceNgn = parseInt(productPrice.dataset.priceNgn);
-    if (priceNgn) {
-      productPrice.textContent = formatPrice(priceNgn, currency);
+  
+document.querySelectorAll('.product-price-shop').forEach(el => {
+  const priceNgn = parseInt(el.dataset.priceNgn);
+  const salePriceNgn = parseInt(el.dataset.salePriceNgn) || null;
+  const onSale = el.dataset.onSale === 'true';
+  
+  if (priceNgn) {
+    if (onSale && salePriceNgn) {
+      const originalSpan = el.querySelector('.original-price');
+      const saleSpan = el.querySelector('.sale-price');
+      
+      if (originalSpan && saleSpan) {
+        originalSpan.textContent = formatPrice(priceNgn, currency);
+        saleSpan.textContent = formatPrice(salePriceNgn, currency);
+      } else {
+        el.textContent = formatPrice(salePriceNgn, currency);
+      }
+    } else {
+      el.textContent = formatPrice(priceNgn, currency);
     }
   }
+});
   
   // 👇 Add these two lines
   // Refresh cart if on cart page
@@ -272,6 +299,35 @@ async function initCurrency() {
   // Signal that currency is ready
   currencyReady = true;
   document.dispatchEvent(new CustomEvent('currencyReady'));
+}
+
+
+// ===== SALE UTILITY =====
+function isSaleActive(product) {
+  // If product is not on sale or has no sale price, return false
+  if (!product.on_sale || !product.sale_price || Number(product.sale_price) <= 0) {
+    return false;
+  }
+
+  // If no dates are set, treat as active (fallback)
+  if (!product.sale_start && !product.sale_end) {
+    return true;
+  }
+
+  const now = new Date();
+  const startDate = product.sale_start ? new Date(product.sale_start) : null;
+  const endDate = product.sale_end ? new Date(product.sale_end) : null;
+
+  // Normalize end date to end of day
+  if (endDate) {
+    endDate.setHours(23, 59, 59, 999);
+  }
+
+  // Check if within date range
+  if (startDate && now < startDate) return false;
+  if (endDate && now > endDate) return false;
+
+  return true;
 }
 
 // ===== CURRENCY DROPDOWN EVENTS =====

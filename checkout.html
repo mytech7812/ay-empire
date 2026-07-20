@@ -13,6 +13,7 @@
 
   <!-- Main Styles -->
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -41,6 +42,12 @@
 <!-- CHECKOUT SECTION -->
 <section class="checkout-section">
   <div class="checkout-container">
+
+    <!-- Checkout Loading State -->
+<div id="checkout-loading" style="display: none; text-align: center; padding: 4rem 0;">
+  <div style="width: 40px; height: 40px; margin: 0 auto 1rem; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spinnerSpin 0.8s ease-in-out infinite;"></div>
+  <p style="color: var(--text-mid);">Verifying your cart...</p>
+</div>
 
     <div class="checkout-header">
       <h1 class="checkout-title">Checkout</h1>
