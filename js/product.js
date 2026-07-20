@@ -131,6 +131,25 @@ document.addEventListener('DOMContentLoaded', async function() {
   document.getElementById('product-category').textContent = product.category;
   document.getElementById('product-name').textContent = product.name;
 
+  const isOutOfStock = product.stock !== undefined && product.stock !== null && product.stock <= 0;
+  const stockAvailable = product.stock !== undefined && product.stock !== null ? product.stock : 999;
+
+  const productImageCol = document.querySelector('.product-image-col');
+  if (productImageCol) {
+    const existingBadge = productImageCol.querySelector('.sold-out-badge');
+    if (existingBadge) {
+      existingBadge.remove();
+    }
+
+    productImageCol.classList.toggle('is-out-of-stock', isOutOfStock);
+
+    if (isOutOfStock) {
+      const badge = document.createElement('div');
+      badge.className = 'sold-out-badge';
+      badge.textContent = 'Out of Stock';
+      productImageCol.appendChild(badge);
+    }
+  }
 
 // ✅ Use centralized isSaleActive function
 const isOnSale = isSaleActive(product);
@@ -168,9 +187,6 @@ if (isOnSale && salePrice) {
   document.getElementById('meta-category').textContent = product.category;
 
   // ===== STOCK CHECK =====
-  const isOutOfStock = product.stock !== undefined && product.stock !== null && product.stock <= 0;
-  const stockAvailable = product.stock !== undefined && product.stock !== null ? product.stock : 999;
-
   document.getElementById('meta-stock').textContent = isOutOfStock ? 'Out of Stock' : (stockAvailable > 0 ? 'In Stock' : 'Out of Stock');
 
   // Update add to cart button

@@ -7,7 +7,6 @@ const checkoutShipping = document.getElementById('checkout-shipping');
 const checkoutTotal = document.getElementById('checkout-total');
 const placeOrderBtn = document.getElementById('place-order-btn');
 
-// 👇 ADD verifyCartItems() HERE
 // ===== VERIFY CART ITEMS AGAINST SUPABASE =====
 async function verifyCartItems() {
   const cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -142,7 +141,7 @@ async function loadCheckout() {
   // Update localStorage with ONLY available items
   localStorage.setItem('cart', JSON.stringify(availableItems));
   
-  if (availableItems.length === 0) {
+  if (availableItems.length === 0 && unavailableItems.length === 0) {
     window.location.href = 'cart.html';
     return;
   }
@@ -249,32 +248,54 @@ function getDeliveryFee(country) {
   if (getDeliveryMethod() === 'pickup') {
     return 0;
   }
-  
-  // South Africa: 100 ZAR converted to NGN
+
+  const rate = getExchangeRate('ZAR') || 84;
+
+  // South Africa: 100 ZAR
   if (country === 'South Africa') {
-    const rate = getExchangeRate('ZAR');
     return 100 * rate;
   }
-  
+
   // Nigeria: Free (settled on arrival)
   if (country === 'Nigeria') {
     return 0;
   }
-  
-  // USA, Canada, Mexico: R 2,500 converted to NGN
-  if (country === 'USA' || country === 'Canada' || country === 'Mexico') {
-    const rate = getExchangeRate('ZAR');
-    return 2500 * rate;
+
+  // ===== ZONE 1: Sub-Saharan Africa (R800) =====
+  const zone1 = [
+    'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cabo Verde',
+    'Cameroon', 'Central African Republic', 'Chad', 'Comoros', 'Congo',
+    'DR Congo', 'Djibouti', 'Equatorial Guinea', 'Eritrea', 'Eswatini',
+    'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Guinea', 'Guinea-Bissau',
+    'Ivory Coast', 'Kenya', 'Lesotho', 'Liberia', 'Madagascar', 'Malawi',
+    'Mali', 'Mauritania', 'Mauritius', 'Mozambique', 'Namibia', 'Niger',
+    'Rwanda', 'Sao Tome and Principe', 'Senegal', 'Seychelles', 'Sierra Leone',
+    'Somalia', 'Sudan', 'Tanzania', 'Togo', 'Uganda', 'Zambia', 'Zimbabwe'
+  ];
+
+  if (zone1.includes(country)) {
+    return 800 * rate;
   }
-  
-  // UK and UAE: R 2,200 converted to NGN
-  if (country === 'UK' || country === 'United Arab Emirates') {
-    const rate = getExchangeRate('ZAR');
-    return 2200 * rate;
+
+  // ===== ZONE 2: Europe and Middle East (R1,000) =====
+  const zone2 = [
+    'United Kingdom', 'France', 'Germany', 'Italy', 'Spain', 'Netherlands',
+    'Belgium', 'Switzerland', 'Austria', 'Sweden', 'Norway', 'Denmark',
+    'Finland', 'Ireland', 'Portugal', 'Greece', 'Turkey', 'Israel',
+    'United Arab Emirates', 'Saudi Arabia', 'Qatar', 'Kuwait', 'Bahrain',
+    'Oman', 'Jordan', 'Lebanon'
+  ];
+
+  if (zone2.includes(country)) {
+    return 1000 * rate;
   }
-  
-  // All other countries: R 1,200 converted to NGN
-  const rate = getExchangeRate('ZAR');
+
+  // ===== ZONE 3: USA, Canada, Mexico (R1,100) =====
+  if (['USA', 'Canada', 'Mexico'].includes(country)) {
+    return 1100 * rate;
+  }
+
+  // ===== ZONE 4: Rest of the world (R1,200) =====
   return 1200 * rate;
 }
 

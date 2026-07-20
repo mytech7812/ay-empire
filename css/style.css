@@ -755,6 +755,32 @@
 .product-quantity {
   margin-bottom: 1.5rem;
 }
+
+.product-image-col {
+  position: relative;
+}
+
+.product-image-col.is-out-of-stock img {
+  filter: grayscale(0.45);
+  opacity: 0.72;
+}
+
+.product-image-col .sold-out-badge {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  transform: none;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.8);
+  color: var(--white);
+  z-index: 3;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+}
 .product-quantity label {
   display: block;
   font-size: 0.8rem;
@@ -806,6 +832,18 @@
   max-width: 300px;
   padding: 1rem;
   font-size: 0.9rem;
+}
+
+.add-to-cart-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.add-to-cart-btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* Product Meta */
@@ -3576,4 +3614,70 @@
   padding: 0.3rem 0.5rem;
   background: rgba(230, 126, 34, 0.08);
   border-radius: 4px;
+}
+/* ===== OUT OF STOCK TAG (shop/product pages) ===== */
+.out-of-stock-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #999;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 2px;
+  z-index: 5;
+}
+
+/* Remove grey overlay from product cards */
+.treatment-card.out-of-stock {
+  /* Keep this empty or remove the filter/opacity properties */
+}
+
+/* Disabled Add to Cart button */
+.shop-add-to-cart:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.shop-add-to-cart:disabled:hover {
+  background: #ccc;
+  transform: none;
+  box-shadow: none;
+}
+/* Checkout country picker */
+.country-search-wrapper {
+  position: relative;
+}
+
+.country-search-input {
+  width: 100%;
+}
+
+.country-select {
+  display: none;
+  width: 100%;
+  margin-top: 0.4rem;
+  max-height: 13rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--white);
+  color: var(--text-dark);
+  font: inherit;
+}
+
+.country-search-wrapper.is-open .country-select {
+  display: block;
+}
+
+.country-select option {
+  padding: 0.45rem 0.7rem;
+}
+
+.country-select option[hidden] {
+  display: none;
 }

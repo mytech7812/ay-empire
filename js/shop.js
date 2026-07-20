@@ -188,42 +188,42 @@ function renderProducts() {
       displayPrice = formatPrice(product.price, currentCurrency);
     }
 
-    card.innerHTML = `
-      <div class="treatment-card ${isOutOfStock ? 'out-of-stock' : ''}">
-        <a href="product.html?id=${product.id}" class="shop-card-image-link">
-          <div class="treatment-img">
-            <img src="${product.image}" alt="${product.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
-            ${isOutOfStock ? `<div class="sold-out-badge">Sold Out</div>` : ''}
-            ${isOnSale && !isOutOfStock ? `<div class="sale-ribbon">${discountPercent}% OFF</div>` : ''}
-          </div>
-        </a>
-        <div class="treatment-info">
-          <a href="product.html?id=${product.id}" class="shop-card-title-link">
-            <div class="treatment-name">${product.name}</div>
-          </a>
-          <div class="treatment-sub">${product.sub}</div>
-          <div class="shop-card-actions">
-            <div class="shop-quantity-selector" aria-label="Quantity for ${product.name}">
-              <button type="button" class="shop-qty-btn shop-qty-decrease" aria-label="Decrease quantity" ${isOutOfStock ? 'disabled' : ''}>−</button>
-              <input type="number" class="shop-qty-input" value="1" min="1" max="${isOutOfStock ? 0 : stockAvailable}" aria-label="Quantity" ${isOutOfStock ? 'disabled' : ''}>
-              <button type="button" class="shop-qty-btn shop-qty-increase" aria-label="Increase quantity" ${isOutOfStock ? 'disabled' : ''}>+</button>
-            </div>
-            <button type="button" class="btn-primary shop-add-to-cart" data-product-id="${product.id}" ${isOutOfStock ? 'disabled' : ''}>
-              ${isOutOfStock ? 'Sold Out' : 'Add to Cart'}
-            </button>
-          </div>
-          <div class="product-price-shop" 
-               data-price-ngn="${product.price}"
-               data-sale-price-ngn="${isOnSale && salePrice ? salePrice * getExchangeRate('ZAR') : ''}"
-               data-on-sale="${isOnSale && !isOutOfStock ? 'true' : 'false'}">
-            ${isOnSale && !isOutOfStock ? `
-              <span class="original-price">${originalDisplayPrice}</span>
-              <span class="sale-price">${displayPrice}</span>
-            ` : displayPrice}
-          </div>
-        </div>
+card.innerHTML = `
+  <div class="treatment-card">
+    <a href="product.html?id=${product.id}" class="shop-card-image-link">
+      <div class="treatment-img">
+        <img src="${product.image}" alt="${product.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+        ${isOutOfStock ? `<div class="out-of-stock-tag">Out of Stock</div>` : ''}
+        ${isOnSale && !isOutOfStock ? `<div class="sale-ribbon">${discountPercent}% OFF</div>` : ''}
       </div>
-    `;
+    </a>
+    <div class="treatment-info">
+      <a href="product.html?id=${product.id}" class="shop-card-title-link">
+        <div class="treatment-name">${product.name}</div>
+      </a>
+      <div class="treatment-sub">${product.sub}</div>
+      <div class="shop-card-actions">
+        <div class="shop-quantity-selector" aria-label="Quantity for ${product.name}">
+          <button type="button" class="shop-qty-btn shop-qty-decrease" aria-label="Decrease quantity" ${isOutOfStock ? 'disabled' : ''}>−</button>
+          <input type="number" class="shop-qty-input" value="1" min="1" max="${isOutOfStock ? 0 : stockAvailable}" aria-label="Quantity" ${isOutOfStock ? 'disabled' : ''}>
+          <button type="button" class="shop-qty-btn shop-qty-increase" aria-label="Increase quantity" ${isOutOfStock ? 'disabled' : ''}>+</button>
+        </div>
+        <button type="button" class="btn-primary shop-add-to-cart" data-product-id="${product.id}" ${isOutOfStock ? 'disabled' : ''}>
+          ${isOutOfStock ? 'Sold Out' : 'Add to Cart'}
+        </button>
+      </div>
+      <div class="product-price-shop" 
+           data-price-ngn="${product.price}"
+           data-sale-price-ngn="${isOnSale && salePrice ? salePrice * getExchangeRate('ZAR') : ''}"
+           data-on-sale="${isOnSale && !isOutOfStock ? 'true' : 'false'}">
+        ${isOnSale && !isOutOfStock ? `
+          <span class="original-price">${originalDisplayPrice}</span>
+          <span class="sale-price">${displayPrice}</span>
+        ` : displayPrice}
+      </div>
+    </div>
+  </div>
+`;
     
     shopGrid.appendChild(card);
   });
